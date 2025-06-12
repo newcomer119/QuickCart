@@ -13,7 +13,7 @@ async function connectDb() {
 
     if(!cached.promise){
         const opts = {
-            bufferCommands : fasle
+            bufferCommands : false
         }
         cached.promise = mongoose.connect(`${process.env.MONGODB_URI}/filamentfreaks`, opts).then(mongoose => {
             return mongoose
