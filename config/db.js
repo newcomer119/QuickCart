@@ -8,6 +8,7 @@ if(!cached){
 
 async function connectDb() {
     if(cached.conn){
+        console.log("Using cached database connection");
         return cached.conn
     }
 
@@ -15,14 +16,35 @@ async function connectDb() {
         const opts = {
             bufferCommands : false
         }
-        cached.promise = mongoose.connect(`${process.env.MONGODB_URI}/filamentfreaks`, opts).then(mongoose => {
-            return mongoose
-        })
+        
+        // Debug: Check if MONGODB_URI exists
+        if (!process.env.MONGODB_URI) {
+            console.error("MONGODB_URI is not defined in environment variables");
+            throw new Error("MONGODB_URI is not defined");
+        }
+
+        // Debug: Print masked connection string
+        const maskedUri = process.env.MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//****:****@');
+        console.log("Attempting to connect to MongoDB with URI:", maskedUri);
+
+        cached.promise = mongoose.connect(`${process.env.MONGODB_URI}/filamentfreaks`, opts)
+            .then(mongoose => {
+                console.log("Successfully connected to MongoDB");
+                return mongoose
+            })
+            .catch(err => {
+                console.error("MongoDB connection error:", err);
+                throw err;
+            });
     }
 
-    cached.conn = await cached.promise
-    return cached.conn
-
+    try {
+        cached.conn = await cached.promise;
+        return cached.conn;
+    } catch (error) {
+        console.error("Failed to establish MongoDB connection:", error);
+        throw error;
+    }
 }
 
 export default connectDb
