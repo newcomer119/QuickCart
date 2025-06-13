@@ -2,9 +2,12 @@
 import React, { useState } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { useAppContext } from "@/context/AppContext";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const AddProduct = () => {
-
+  const {getToken} = useAppContext()
   const [files, setFiles] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -14,7 +17,57 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if any files are selected
+    if (files.length === 0) {
+      toast.error("Please select at least one image");
+      return;
+    }
 
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description); // Fixed: was using name instead of description
+    formData.append('category', category);
+    formData.append('price', price);
+    formData.append('offerPrice', offerPrice);
+
+    // Append each file to formData
+    files.forEach((file, index) => {
+      if (file) {
+        formData.append('images', file);
+      }
+    });
+
+    try {
+      const token = await getToken();
+      if (!token) {
+        toast.error("Authentication token not found");
+        return;
+      }
+
+      const { data } = await axios.post('/api/product/add', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+        // Reset form
+        setFiles([]);
+        setName('');
+        setDescription('');
+        setCategory('Earphone');
+        setPrice('');
+        setOfferPrice('');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error uploading product:", error);
+      toast.error(error.message || "Error uploading product");
+    }
   };
 
   return (
@@ -23,14 +76,21 @@ const AddProduct = () => {
         <div>
           <p className="text-base font-medium">Product Image</p>
           <div className="flex flex-wrap items-center gap-3 mt-2">
-
             {[...Array(4)].map((_, index) => (
               <label key={index} htmlFor={`image${index}`}>
-                <input onChange={(e) => {
-                  const updatedFiles = [...files];
-                  updatedFiles[index] = e.target.files[0];
-                  setFiles(updatedFiles);
-                }} type="file" id={`image${index}`} hidden />
+                <input 
+                  onChange={(e) => {
+                    if (e.target.files[0]) {
+                      const updatedFiles = [...files];
+                      updatedFiles[index] = e.target.files[0];
+                      setFiles(updatedFiles);
+                    }
+                  }} 
+                  type="file" 
+                  id={`image${index}`} 
+                  accept="image/*"
+                  hidden 
+                />
                 <Image
                   key={index}
                   className="max-w-24 cursor-pointer"
@@ -41,7 +101,6 @@ const AddProduct = () => {
                 />
               </label>
             ))}
-
           </div>
         </div>
         <div className="flex flex-col gap-1 max-w-md">
@@ -84,7 +143,7 @@ const AddProduct = () => {
               id="category"
               className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
               onChange={(e) => setCategory(e.target.value)}
-              defaultValue={category}
+              value={category}
             >
               <option value="Earphone">Earphone</option>
               <option value="Headphone">Headphone</option>

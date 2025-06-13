@@ -27,7 +27,8 @@ async function connectDb() {
         const maskedUri = process.env.MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//****:****@');
         console.log("Attempting to connect to MongoDB with URI:", maskedUri);
 
-        cached.promise = mongoose.connect(`${process.env.MONGODB_URI}/filamentfreaks`, opts)
+        // Use 'test' database instead of 'filamentfreaks'
+        cached.promise = mongoose.connect(`${process.env.MONGODB_URI}/test`, opts)
             .then(mongoose => {
                 console.log("Successfully connected to MongoDB");
                 return mongoose
