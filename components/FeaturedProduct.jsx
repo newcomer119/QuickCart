@@ -1,29 +1,36 @@
 import React from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const products = [
   {
     id: 1,
     image: assets.girl_with_headphone_image,
-    title: "Unparalleled Sound",
-    description: "Experience crystal-clear audio with premium headphones.",
+    title: "Premium 3D Filaments",
+    description: "High-quality filaments for perfect prints every time.",
   },
   {
     id: 2,
     image: assets.girl_with_earphone_image,
-    title: "Stay Connected",
-    description: "Compact and stylish earphones for every occasion.",
+    title: "Custom 3D Designs",
+    description: "Unique and personalized 3D printing designs for your needs.",
   },
   {
     id: 3,
     image: assets.boy_with_laptop_image,
-    title: "Power in Every Pixel",
-    description: "Shop the latest laptops for work, gaming, and more.",
+    title: "Professional 3D Printers",
+    description: "State-of-the-art 3D printers for professional results.",
   },
 ];
 
 const FeaturedProduct = () => {
+  const router = useRouter();
+
+  const handleShopNow = () => {
+    router.push('/all-products');
+  };
+
   return (
     <div className="mt-14">
       <div className="flex flex-col items-center">
@@ -44,8 +51,11 @@ const FeaturedProduct = () => {
               <p className="text-sm lg:text-base leading-5 max-w-60">
                 {description}
               </p>
-              <button className="flex items-center gap-1.5 bg-orange-600 px-4 py-2 rounded">
-                Buy now <Image className="h-3 w-3" src={assets.redirect_icon} alt="Redirect Icon" />
+              <button 
+                onClick={handleShopNow}
+                className="flex items-center gap-1.5 bg-orange-600 px-4 py-2 rounded hover:bg-orange-700 transition"
+              >
+                Shop Now <Image className="h-3 w-3" src={assets.redirect_icon} alt="Redirect Icon" />
               </button>
             </div>
           </div>

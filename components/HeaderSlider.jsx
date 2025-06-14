@@ -1,32 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const HeaderSlider = () => {
+  const router = useRouter();
   const sliderData = [
     {
       id: 1,
-      title: "Experience Pure Sound - Your Perfect Headphones Awaits!",
-      offer: "Limited Time Offer 30% Off",
-      buttonText1: "Buy now",
+      title: "Bringing Ideas to life, Layer by Layer",
+      offer: "Get the best custom prints with high-quality filament",
+      buttonText1: "Shop now",
       buttonText2: "Find more",
-      imgSrc: assets.header_headphone_image,
+      imgSrc: assets.banner,
     },
     {
       id: 2,
-      title: "Next-Level Gaming Starts Here - Discover PlayStation 5 Today!",
-      offer: "Hurry up only few lefts!",
+      title: "Bringing pixels to Reality",
+      offer: "Turn your creativity into reality with our best-selling products",
       buttonText1: "Shop Now",
       buttonText2: "Explore Deals",
-      imgSrc: assets.header_playstation_image,
+      imgSrc: assets.banner2,
     },
     {
       id: 3,
-      title: "Power Meets Elegance - Apple MacBook Pro is Here for you!",
-      offer: "Exclusive Deal 40% Off",
-      buttonText1: "Order Now",
+      title: "Bringing Ideas to life, Layer by Layer",
+      offer: "Get the best custom prints with high-quality filament",
+      buttonText1: "Shop Now",
       buttonText2: "Learn More",
-      imgSrc: assets.header_macbook_image,
+      imgSrc: assets.banner3,
     },
   ];
 
@@ -41,6 +43,10 @@ const HeaderSlider = () => {
 
   const handleSlideChange = (index) => {
     setCurrentSlide(index);
+  };
+
+  const handleShopNow = () => {
+    router.push('/all-products');
   };
 
   return (
@@ -62,7 +68,10 @@ const HeaderSlider = () => {
                 {slide.title}
               </h1>
               <div className="flex items-center mt-4 md:mt-6 ">
-                <button className="md:px-10 px-7 md:py-2.5 py-2 bg-orange-600 rounded-full text-white font-medium">
+                <button 
+                  onClick={handleShopNow}
+                  className="md:px-10 px-7 md:py-2.5 py-2 bg-orange-600 rounded-full text-white font-medium hover:bg-orange-700 transition"
+                >
                   {slide.buttonText1}
                 </button>
                 <button className="group flex items-center gap-2 px-6 py-2.5 font-medium">
