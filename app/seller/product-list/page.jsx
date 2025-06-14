@@ -80,7 +80,7 @@ const ProductList = () => {
                     <td className="px-4 py-3 max-sm:hidden">
                       {product.category}
                     </td>
-                    <td className="px-4 py-3">${product.offerPrice}</td>
+                    <td className="px-4 py-3">₹{product.offerPrice}</td>
                     <td className="px-4 py-3 max-sm:hidden">
                       <button
                         onClick={() => router.push(`/product/${product._id}`)}
