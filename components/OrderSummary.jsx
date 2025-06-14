@@ -20,7 +20,7 @@ const OrderSummary = () => {
   } = useAppContext();
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const [paymentMethod, setPaymentMethod] = useState('COD');
   const [userAddresses, setUserAddresses] = useState([]);
 
   const fetchUserAddresses = async () => {
@@ -49,6 +49,92 @@ const OrderSummary = () => {
     setIsDropdownOpen(false);
   };
 
+  const initializeRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async (orderData) => {
+    try {
+      const res = await initializeRazorpay();
+      if (!res) {
+        toast.error("Razorpay SDK failed to load");
+        return;
+      }
+
+      const totalAmount = getCartAmount() + Math.floor(getCartAmount() * 0.02);
+      console.log('Creating payment for amount:', totalAmount);
+
+      const { data } = await axios.post('/api/payment/create', {
+        amount: totalAmount
+      });
+
+      if (!data.success) {
+        toast.error(data.message);
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: "QuickCart",
+        description: "Payment for your order",
+        order_id: data.order.id,
+        handler: async function (response) {
+          try {
+            const { data: verifyData } = await axios.post('/api/payment/verify', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId: orderData._id
+            });
+
+            if (verifyData.success) {
+              toast.success("Payment successful!");
+              setCartItems({});
+              router.push('/order-placed');
+            } else {
+              toast.error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            toast.error("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: user?.fullName || selectedAddress?.fullName,
+          email: user?.email,
+          contact: selectedAddress?.phoneNumber
+        },
+        theme: {
+          color: "#F97316"
+        },
+        modal: {
+          ondismiss: function() {
+            toast.error("Payment cancelled");
+          }
+        }
+      };
+
+      console.log('Opening Razorpay with options:', options);
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error(error.message);
+    }
+  };
+
   const createOrder = async () => {
     try {
       if (!selectedAddress) {
@@ -65,15 +151,20 @@ const OrderSummary = () => {
       const token = await getToken()
       const { data } = await axios.post('/api/order/create', {
         address: selectedAddress._id,
-        items: cartItemsArray
+        items: cartItemsArray,
+        paymentMethod
       }, {
         headers: { Authorization: `Bearer ${token}` }
       })
 
       if (data.success) {
-        toast.success(data.message)
-        setCartItems({})
-        router.push('/order-placed')
+        if (paymentMethod === 'ONLINE') {
+          await handlePayment(data.order);
+        } else {
+          toast.success(data.message)
+          setCartItems({})
+          router.push('/order-placed')
+        }
       } else {
         toast.error(data.message)
       }
@@ -153,6 +244,36 @@ const OrderSummary = () => {
 
         <div>
           <label className="text-base font-medium uppercase text-gray-600 block mb-2">
+            Payment Method
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="payment"
+                value="COD"
+                checked={paymentMethod === 'COD'}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-4 h-4"
+              />
+              Cash on Delivery
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="payment"
+                value="ONLINE"
+                checked={paymentMethod === 'ONLINE'}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-4 h-4"
+              />
+              Pay Online
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-base font-medium uppercase text-gray-600 block mb-2">
             Promo Code
           </label>
           <div className="flex flex-col items-start gap-3">
@@ -202,7 +323,7 @@ const OrderSummary = () => {
         onClick={createOrder}
         className="w-full bg-orange-600 text-white py-3 mt-5 hover:bg-orange-700"
       >
-        Place Order
+        {paymentMethod === 'ONLINE' ? 'Pay Now' : 'Place Order'}
       </button>
     </div>
   );

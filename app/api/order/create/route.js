@@ -3,11 +3,13 @@ import Product from "@/models/Product";
 import User from "@/models/Users";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import connectDb from "@/config/db";
+import Order from "@/models/Order";
 
 export async function POST(request) {
     try {
         const { userId } = getAuth(request)
-        const { address, items } = await request.json()
+        const { address, items, paymentMethod } = await request.json()
 
         if (!address || items.length === 0) {
             return NextResponse.json({ success: false, message: 'Invalid Data' })
@@ -19,25 +21,43 @@ export async function POST(request) {
             return await acc + product.offerPrice * item.quantity
         }, 0)
 
-        const orderData = {
+        const totalAmount = amount + Math.floor(amount * 0.02);
+
+        await connectDb();
+        
+        const order = await Order.create({
             userId,
             address,
             items,
-            amount: amount + Math.floor(amount * 0.02),
-            date: Date.now()
-        }
-
-        await inngest.send({
-            name: "order/created",
-            data: orderData
-        })
+            amount: totalAmount,
+            paymentMethod,
+            paymentStatus: paymentMethod === 'ONLINE' ? 'PENDING' : 'COMPLETED',
+            date: Date.now(),
+            data: { items, address, paymentMethod }
+        });
 
         // clear user cart 
         const user = await User.findById(userId)
         user.cartItems = {}
         await user.save()
 
-        return NextResponse.json({ success: true, message: "Order Placed" })
+        await inngest.send({
+            name: "order/created",
+            data: {
+                userId,
+                address,
+                items,
+                amount: totalAmount,
+                paymentMethod,
+                date: Date.now()
+            }
+        })
+
+        return NextResponse.json({ 
+            success: true, 
+            message: "Order Placed",
+            order
+        })
 
     } catch (error) {
         console.error("Error creating order:", error)

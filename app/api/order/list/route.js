@@ -10,7 +10,9 @@ export async function GET(request) {
         const{userId} = getAuth(request);
         await connectDb()
 
-        const orders = await Order.find({userId}).populate('address item.products')
+        const orders = await Order.find({userId})
+            .populate('address')
+            .populate('items.product')
 
         return NextResponse.json({success : true, orders })
 
