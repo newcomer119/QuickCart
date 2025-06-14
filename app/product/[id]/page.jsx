@@ -9,11 +9,12 @@ import { useParams } from "next/navigation";
 import Loading from "@/components/Loading";
 import { useAppContext } from "@/context/AppContext";
 import React from "react";
+import toast from "react-hot-toast";
 
 const Product = () => {
   const { id } = useParams();
 
-  const { products, router, addToCart } = useAppContext();
+  const { products, router, addToCart, user } = useAppContext();
 
   const [mainImage, setMainImage] = useState(null);
   const [productData, setProductData] = useState(null);
@@ -132,6 +133,11 @@ const Product = () => {
               </button>
               <button
                 onClick={() => {
+                  if (!user) {
+                    toast.error("Please login first to buy products");
+                    router.push('/');
+                    return;
+                  }
                   addToCart(productData._id);
                   router.push("/cart");
                 }}

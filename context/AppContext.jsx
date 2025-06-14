@@ -1,6 +1,6 @@
 "use client";
 import { productsDummyData, userDummyData } from "@/assets/assets";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -17,6 +17,7 @@ export const AppContextProvider = (props) => {
   const router = useRouter();
   const { user } = useUser();
   const { getToken } = useAuth();
+  const { signIn } = useClerk();
   const [products, setProducts] = useState([]);
   const [userData, setUserData] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
@@ -71,6 +72,12 @@ export const AppContextProvider = (props) => {
   };
 
   const addToCart = async (itemId) => {
+    if (!user) {
+      toast.error("Please login first to add items to cart");
+      router.push('/');
+      return;
+    }
+
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
       cartData[itemId] += 1;
@@ -78,7 +85,6 @@ export const AppContextProvider = (props) => {
       cartData[itemId] = 1;
     }
     setCartItems(cartData);
-    // toast.success("Item added to cart");
     if (user) {
       try {
         const token = await getToken();
@@ -162,6 +168,7 @@ export const AppContextProvider = (props) => {
     updateCartQuantity,
     getCartCount,
     getCartAmount,
+    signIn,
   };
 
   return (
