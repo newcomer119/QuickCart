@@ -28,11 +28,11 @@ const Navbar = () => {
           <Link href="/all-products" className="hover:text-gray-900 transition">
             Shop
           </Link>
-          <Link href="/" className="hover:text-gray-900 transition">
-            About Us
+          <Link href="/policies" className="hover:text-gray-900 transition">
+            Policies
           </Link>
           <Link href="/" className="hover:text-gray-900 transition">
-            Contact
+            Contact Us
           </Link>
 
           {isSeller && (
