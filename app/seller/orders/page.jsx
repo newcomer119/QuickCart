@@ -14,30 +14,21 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchSellerOrders = async () => {
-    try {
-      const token = await getToken();
-      if (!token) {
-        toast.error("Authentication required");
-        return;
+    try{
+      const token = await getToken()
+      const response = await axios.get('/api/order/seller-order',{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if(response.data.success){
+        setOrders(response.data.orders)
+        setLoading(false)
+      }else{
+        toast.error(response.data.message)
       }
-
-      const { data } = await axios.get("/api/order/seller-order", {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
-
-      if (data.success) {
-        setOrders(data.orders);
-      } else {
-        toast.error(data.message || "Failed to fetch orders");
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      toast.error(error.response?.data?.message || "Failed to fetch orders");
-    } finally {
-      setLoading(false);
+    }catch(error){
+      toast.error(error.message)
     }
   };
 
