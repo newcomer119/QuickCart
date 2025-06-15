@@ -105,10 +105,14 @@ const OrderSummary = () => {
               router.push('/order-placed');
             } else {
               toast.error("Payment verification failed");
+              // Refresh the page to show the correct order status
+              router.refresh();
             }
           } catch (error) {
             console.error("Payment verification error:", error);
             toast.error("Payment verification failed");
+            // Refresh the page to show the correct order status
+            router.refresh();
           }
         },
         prefill: {
@@ -120,8 +124,19 @@ const OrderSummary = () => {
           color: "#F97316"
         },
         modal: {
-          ondismiss: function() {
+          ondismiss: async function() {
             toast.error("Payment cancelled");
+            try {
+              // Delete the pending order when payment is cancelled
+              const token = await getToken();
+              await axios.delete(`/api/order/${orderData._id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              // Refresh the page to show the correct order status
+              router.refresh();
+            } catch (error) {
+              console.error("Error deleting pending order:", error);
+            }
           }
         }
       };

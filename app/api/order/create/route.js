@@ -25,18 +25,41 @@ export async function POST(request) {
 
         await connectDb();
         
+        // For online payment, create a pending order
+        if (paymentMethod === 'ONLINE') {
+            const order = await Order.create({
+                userId,
+                address,
+                items,
+                amount: totalAmount,
+                paymentMethod,
+                paymentStatus: 'PENDING',
+                status: 'PENDING',
+                date: Date.now(),
+                data: { items, address, paymentMethod }
+            });
+
+            return NextResponse.json({ 
+                success: true, 
+                message: "Order created pending payment",
+                order
+            })
+        }
+        
+        // For COD, create a completed order
         const order = await Order.create({
             userId,
             address,
             items,
             amount: totalAmount,
             paymentMethod,
-            paymentStatus: paymentMethod === 'ONLINE' ? 'PENDING' : 'COMPLETED',
+            paymentStatus: 'COMPLETED',
+            status: 'Order Placed',
             date: Date.now(),
             data: { items, address, paymentMethod }
         });
 
-        // clear user cart 
+        // clear user cart only for COD orders
         const user = await User.findById(userId)
         user.cartItems = {}
         await user.save()
