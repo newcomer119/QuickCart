@@ -37,7 +37,7 @@ const HeaderSlider = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sliderData.length);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [sliderData.length]);
 
