@@ -5,7 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
 import { useAppContext } from "@/context/AppContext";
 import React from "react";
@@ -13,8 +13,9 @@ import toast from "react-hot-toast";
 
 const Product = () => {
   const { id } = useParams();
+  const router = useRouter();
 
-  const { products, router, addToCart, user, cartItems } = useAppContext();
+  const { products, router: appRouter, addToCart, user, cartItems } = useAppContext();
 
   const [mainImage, setMainImage] = useState(null);
   const [productData, setProductData] = useState(null);
@@ -129,11 +130,11 @@ const Product = () => {
                 onClick={() => {
                   if (!user) {
                     toast.error("Please login first to add items to cart");
-                    router.push('/');
+                    appRouter.push('/');
                     return;
                   }
                   if (cartItems[productData._id]) {
-                    router.push("/cart");
+                    appRouter.push("/cart");
                   } else {
                     addToCart(productData._id);
                   }
@@ -146,15 +147,15 @@ const Product = () => {
                 onClick={() => {
                   if (!user) {
                     toast.error("Please login first to buy products");
-                    router.push('/');
+                    appRouter.push('/');
                     return;
                   }
                   if (cartItems[productData._id]) {
-                    router.push("/cart");
+                    appRouter.push("/cart");
                   } else {
                     addToCart(productData._id);
                   }
-                  router.push("/cart");
+                  appRouter.push("/cart");
                 }}
                 className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition"
               >
@@ -176,7 +177,10 @@ const Product = () => {
               <ProductCard key={index} product={product} />
             ))}
           </div>
-          <button className="px-8 py-2 mb-16 border rounded text-gray-500/70 hover:bg-slate-50/90 transition">
+          <button 
+            onClick={() => router.push('/all-products')}
+            className="px-8 py-2 mb-16 border rounded text-gray-500/70 hover:bg-slate-50/90 transition"
+          >
             See more
           </button>
         </div>
