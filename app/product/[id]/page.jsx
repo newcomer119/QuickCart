@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 const Product = () => {
   const { id } = useParams();
 
-  const { products, router, addToCart, user } = useAppContext();
+  const { products, router, addToCart, user, cartItems } = useAppContext();
 
   const [mainImage, setMainImage] = useState(null);
   const [productData, setProductData] = useState(null);
@@ -126,7 +126,18 @@ const Product = () => {
 
             <div className="flex items-center mt-10 gap-4">
               <button
-                onClick={() => addToCart(productData._id)}
+                onClick={() => {
+                  if (!user) {
+                    toast.error("Please login first to add items to cart");
+                    router.push('/');
+                    return;
+                  }
+                  if (cartItems[productData._id]) {
+                    router.push("/cart");
+                  } else {
+                    addToCart(productData._id);
+                  }
+                }}
                 className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition"
               >
                 Add to Cart
@@ -138,7 +149,11 @@ const Product = () => {
                     router.push('/');
                     return;
                   }
-                  addToCart(productData._id);
+                  if (cartItems[productData._id]) {
+                    router.push("/cart");
+                  } else {
+                    addToCart(productData._id);
+                  }
                   router.push("/cart");
                 }}
                 className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition"

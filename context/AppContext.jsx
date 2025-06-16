@@ -80,23 +80,24 @@ export const AppContextProvider = (props) => {
 
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
-      cartData[itemId] += 1;
+      // If item already in cart, do not increment, just confirm
+      toast.success("Item is already in your cart");
     } else {
       cartData[itemId] = 1;
-    }
-    setCartItems(cartData);
-    if (user) {
-      try {
-        const token = await getToken();
+      setCartItems(cartData);
+      if (user) {
+        try {
+          const token = await getToken();
 
-        await axios.post(
-          "/api/cart/update",
-          { cartData },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        toast.success("Item added to cart");
-      } catch (error) {
-        toast.error(error.message);
+          await axios.post(
+            "/api/cart/update",
+            { cartData },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          toast.success("Item added to cart");
+        } catch (error) {
+          toast.error(error.message);
+        }
       }
     }
   };
