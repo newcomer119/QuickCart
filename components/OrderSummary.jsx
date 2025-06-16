@@ -163,6 +163,11 @@ const OrderSummary = () => {
         return toast.error("cart is empty")
       }
 
+      if (paymentMethod === 'ONLINE') {
+        toast.error('Online payment coming soon! Please choose Cash on Delivery for now.')
+        return;
+      }
+
       const token = await getToken()
       const { data } = await axios.post('/api/order/create', {
         address: selectedAddress._id,
@@ -173,6 +178,7 @@ const OrderSummary = () => {
       })
 
       if (data.success) {
+        /* Razorpay integration temporarily disabled
         if (paymentMethod === 'ONLINE') {
           await handlePayment(data.order);
         } else {
@@ -180,6 +186,10 @@ const OrderSummary = () => {
           setCartItems({})
           router.push('/order-placed')
         }
+        */
+        toast.success(data.message)
+        setCartItems({})
+        router.push('/order-placed')
       } else {
         toast.error(data.message)
       }
