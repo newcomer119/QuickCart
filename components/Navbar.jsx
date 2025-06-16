@@ -15,13 +15,13 @@ const Navbar = () => {
   return (
     <>
       <nav className="flex items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 text-gray-700">
-        <Image
+        {/* <Image
           className="cursor-pointer w-28 md:w-32"
           onClick={() => router.push("/")}
           src={assets.logo}
           alt="logo"
-        />
-        <div className="flex items-center gap-4 lg:gap-8 max-md:hidden">
+        /> */}
+        <div className="flex items-center justify-center gap-4 lg:gap-8 max-md:hidden flex-grow">
           <Link href="/" className="hover:text-gray-900 transition">
             Home
           </Link>
@@ -46,12 +46,12 @@ const Navbar = () => {
         </div>
 
         <ul className="hidden md:flex items-center gap-4 ">
-          <button
+          {/* <button
             onClick={() => setIsSearchOpen(true)}
             className="hover:text-gray-900 transition"
           >
             <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
-          </button>
+          </button> */}
           {user ? (
             <>
               <UserButton>
@@ -83,12 +83,12 @@ const Navbar = () => {
         </ul>
 
         <div className="flex items-center md:hidden gap-3">
-          <button
+          {/* <button
             onClick={() => setIsSearchOpen(true)}
             className="hover:text-gray-900 transition"
           >
             <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
-          </button>
+          </button> */}
           {isSeller && (
             <button
               onClick={() => router.push("/seller")}
