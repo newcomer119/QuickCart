@@ -85,9 +85,9 @@ const SearchModal = () => {
                   className="p-3 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
                   onClick={() => handleProductClick(product._id)}
                 >
-                  {product.images && product.images[0] && (
+                  {product.image && product.image[0] && (
                     <Image
-                      src={product.images[0]}
+                      src={product.image[0]}
                       alt={product.name}
                       width={40}
                       height={40}
