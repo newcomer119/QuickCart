@@ -22,6 +22,7 @@ const ProductList = () => {
       });
       if (data.success) {
         setProducts(data.products);
+        console.log("Fetched seller products:", data.products);
         setLoading(false);
       } else {
         toast.error(data.message);
@@ -56,6 +57,9 @@ const ProductList = () => {
                   <th className="px-4 py-3 font-medium truncate max-sm:hidden">
                     Category
                   </th>
+                  <th className="px-4 py-3 font-medium truncate max-sm:hidden">
+                    Additional Info
+                  </th>
                   <th className="px-4 py-3 font-medium truncate">Price</th>
                   <th className="px-4 py-3 font-medium truncate max-sm:hidden">
                     Action
@@ -79,6 +83,9 @@ const ProductList = () => {
                     </td>
                     <td className="px-4 py-3 max-sm:hidden">
                       {product.category}
+                    </td>
+                    <td className="px-4 py-3 max-sm:hidden">
+                      {product.additionalInfo ? product.additionalInfo : '-'}
                     </td>
                     <td className="px-4 py-3">₹{product.offerPrice}</td>
                     <td className="px-4 py-3 max-sm:hidden">

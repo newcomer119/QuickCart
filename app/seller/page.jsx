@@ -11,6 +11,7 @@ const AddProduct = () => {
   const [files, setFiles] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [additionalInfo, setAdditionalInfo] = useState('');
   const [category, setCategory] = useState('Earphone');
   const [price, setPrice] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
@@ -26,7 +27,8 @@ const AddProduct = () => {
 
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('description', description); // Fixed: was using name instead of description
+    formData.append('description', description);
+    formData.append('additionalInfo', additionalInfo);
     formData.append('category', category);
     formData.append('price', price);
     formData.append('offerPrice', offerPrice);
@@ -58,6 +60,7 @@ const AddProduct = () => {
         setFiles([]);
         setName('');
         setDescription('');
+        setAdditionalInfo('');
         setCategory('Earphone');
         setPrice('');
         setOfferPrice('');
@@ -132,6 +135,22 @@ const AddProduct = () => {
             onChange={(e) => setDescription(e.target.value)}
             value={description}
             required
+          ></textarea>
+        </div>
+        <div className="flex flex-col gap-1 max-w-md">
+          <label
+            className="text-base font-medium"
+            htmlFor="additional-info"
+          >
+            Additional Product Info
+          </label>
+          <textarea
+            id="additional-info"
+            rows={4}
+            className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40 resize-none"
+            placeholder="Enter any additional information here..."
+            onChange={(e) => setAdditionalInfo(e.target.value)}
+            value={additionalInfo}
           ></textarea>
         </div>
         <div className="flex items-center gap-5 flex-wrap">

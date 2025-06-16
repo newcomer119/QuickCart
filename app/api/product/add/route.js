@@ -36,6 +36,7 @@ export async function POST(request) {
 
         const name = formData.get('name');
         const description = formData.get('description');
+        const additionalInfo = formData.get('additionalInfo');
         const category = formData.get('category');
         const price = formData.get('price');
         const offerPrice = formData.get('offerPrice');
@@ -97,6 +98,7 @@ export async function POST(request) {
             userId,
             name,
             description,
+            additionalInfo,
             category,
             price: Number(price),
             offerPrice: Number(offerPrice),
