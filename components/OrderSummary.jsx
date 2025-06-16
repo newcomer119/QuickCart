@@ -178,17 +178,13 @@ const OrderSummary = () => {
       })
 
       if (data.success) {
-        /* Razorpay integration temporarily disabled
-        if (paymentMethod === 'ONLINE') {
-          await handlePayment(data.order);
-        } else {
-          toast.success(data.message)
-          setCartItems({})
-          router.push('/order-placed')
-        }
-        */
         toast.success(data.message)
         setCartItems({})
+        // Store order details for email
+        if (data.orderDetails) {
+          console.log('Storing order details:', data.orderDetails);
+          localStorage.setItem('lastOrder', JSON.stringify(data.orderDetails));
+        }
         router.push('/order-placed')
       } else {
         toast.error(data.message)

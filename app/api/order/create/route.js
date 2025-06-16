@@ -5,6 +5,8 @@ import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import connectDb from "@/config/db";
 import Order from "@/models/Order";
+import { sendOrderConfirmationEmail } from "@/lib/emailjs";
+import Address from "@/models/Address";
 
 export async function POST(request) {
     try {
@@ -25,6 +27,12 @@ export async function POST(request) {
 
         await connectDb();
         
+        // Get user details for email
+        const user = await User.findById(userId);
+        if (!user) {
+            return NextResponse.json({ success: false, message: 'User not found' });
+        }
+
         // For online payment, create a pending order
         if (paymentMethod === 'ONLINE') {
             const order = await Order.create({
@@ -60,9 +68,52 @@ export async function POST(request) {
         });
 
         // clear user cart only for COD orders
-        const user = await User.findById(userId)
         user.cartItems = {}
         await user.save()
+
+        // Get product details for email
+        const itemsWithDetails = await Promise.all(items.map(async (item) => {
+            const product = await Product.findById(item.product);
+            return {
+                name: product.name,
+                quantity: item.quantity,
+                price: product.offerPrice
+            };
+        }));
+
+        // Get full address details
+        const addressDetails = await Address.findById(address);
+        const formattedAddress = addressDetails ? 
+            `${addressDetails.fullName}, ${addressDetails.area}, ${addressDetails.city}, ${addressDetails.state}, ${addressDetails.pincode}` 
+            : 'Address not found';
+
+        // Prepare order details for email
+        const orderDetails = {
+            email: user.email,
+            orderNumber: order._id,
+            totalAmount,
+            items: itemsWithDetails,
+            shippingAddress: formattedAddress,
+            paymentMethod
+        };
+
+        // Send order confirmation email
+        try {
+            console.log('Preparing to send order confirmation email...');
+            console.log('User email:', user.email);
+            console.log('Order details:', orderDetails);
+
+            const emailResult = await sendOrderConfirmationEmail(orderDetails);
+
+            console.log('Email sending result:', emailResult);
+
+            if (!emailResult.success) {
+                console.error('Failed to send email:', emailResult.error);
+            }
+        } catch (emailError) {
+            console.error('Error in email sending:', emailError);
+            console.error('Error stack:', emailError.stack);
+        }
 
         await inngest.send({
             name: "order/created",
@@ -79,7 +130,8 @@ export async function POST(request) {
         return NextResponse.json({ 
             success: true, 
             message: "Order Placed",
-            order
+            order,
+            orderDetails
         })
 
     } catch (error) {
