@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React from "react";
 import HeaderSlider from "@/components/HeaderSlider";
 import HomeProducts from "@/components/HomeProducts";
 import Banner from "@/components/Banner";
@@ -12,7 +12,6 @@ import { assets } from "@/assets/assets";
 import SearchModal from "@/components/SearchModal";
 
 const Home = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <>
@@ -22,12 +21,9 @@ const Home = () => {
           src={assets.logo}
           alt="logo"
         />
-        <button
-          onClick={() => setIsSearchOpen(true)}
-          className="hover:text-gray-900 transition"
-        >
-          <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
-        </button>
+        <div className="flex-grow flex justify-center mx-4 max-w-xl">
+          <SearchModal />
+        </div>
       </div>
       <Navbar/>
       <div className="px-6 md:px-16 lg:px-32">
@@ -38,7 +34,6 @@ const Home = () => {
         <NewsLetter />
       </div>
       <Footer />
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 };
