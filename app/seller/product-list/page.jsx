@@ -34,6 +34,26 @@ const ProductList = () => {
     setLoading(false);
   };
 
+  const handleDelete = async (productId) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        const token = await getToken();
+        const { data } = await axios.delete(`/api/product/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data.success) {
+          toast.success(data.message);
+          // Refresh the product list
+          fetchSellerProduct();
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchSellerProduct();
@@ -90,15 +110,24 @@ const ProductList = () => {
                     <td className="px-4 py-3">₹{product.offerPrice}</td>
                     <td className="px-4 py-3 max-sm:hidden">
                       <button
-                        onClick={() => router.push(`/product/${product._id}`)}
-                        className="flex items-center gap-1 px-1.5 md:px-3.5 py-2 bg-orange-600 text-white rounded-md"
+                        onClick={() => handleDelete(product._id)}
+                        className="flex items-center gap-1 px-1.5 md:px-3.5 py-2 bg-red-600 text-white rounded-md"
                       >
-                        <span className="hidden md:block">Visit</span>
-                        <Image
-                          className="h-3.5"
-                          src={assets.redirect_icon}
-                          alt="redirect_icon"
-                        />
+                        <span className="hidden md:block">Delete</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
                       </button>
                     </td>
                   </tr>
