@@ -25,7 +25,7 @@ const EmailSender = ({ orderDetails }) => {
 
                 const templateParams = {
                     email: user.primaryEmailAddress.emailAddress,
-                    reply_to: 'mitarthpandey@gmail.com',
+                    reply_to: 'freaksfilament@gmail.com',
                     order_number: orderDetails.orderNumber,
                     total_amount: `₹${orderDetails.totalAmount}`,
                     items: formattedItems,
