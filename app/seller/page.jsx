@@ -13,8 +13,19 @@ const AddProduct = () => {
   const [description, setDescription] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [category, setCategory] = useState('Earphone');
+  const [selectedColors, setSelectedColors] = useState(['Black']);
   const [price, setPrice] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
+
+  const availableColors = ['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Pink', 'Orange', 'Gray', 'Silver', 'Gold', 'Brown', 'Multi'];
+
+  const handleColorChange = (color) => {
+    if (selectedColors.includes(color)) {
+      setSelectedColors(selectedColors.filter(c => c !== color));
+    } else {
+      setSelectedColors([...selectedColors, color]);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,11 +36,18 @@ const AddProduct = () => {
       return;
     }
 
+    // Check if at least one color is selected
+    if (selectedColors.length === 0) {
+      toast.error("Please select at least one color");
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     formData.append('additionalInfo', additionalInfo);
     formData.append('category', category);
+    formData.append('colors', JSON.stringify(selectedColors));
     formData.append('price', price);
     formData.append('offerPrice', offerPrice);
 
@@ -62,6 +80,7 @@ const AddProduct = () => {
         setDescription('');
         setAdditionalInfo('');
         setCategory('Earphone');
+        setSelectedColors(['Black']);
         setPrice('');
         setOfferPrice('');
       } else {
@@ -202,6 +221,32 @@ const AddProduct = () => {
             />
           </div>
         </div>
+
+        {/* Color Selection */}
+        <div className="flex flex-col gap-1 max-w-md">
+          <label className="text-base font-medium">
+            Available Colors
+          </label>
+          <div className="flex flex-wrap gap-3 mt-2">
+            {availableColors.map((color) => (
+              <label key={color} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedColors.includes(color)}
+                  onChange={() => handleColorChange(color)}
+                  className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                />
+                <span className="text-sm">{color}</span>
+              </label>
+            ))}
+          </div>
+          {selectedColors.length > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              Selected: {selectedColors.join(', ')}
+            </p>
+          )}
+        </div>
+
         <button type="submit" className="px-8 py-2.5 bg-orange-600 text-white font-medium rounded">
           ADD
         </button>

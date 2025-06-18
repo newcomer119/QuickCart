@@ -81,7 +81,7 @@ const ExploreCollection = () => {
       submitData.append('designName', formData.designName);
       submitData.append('description', formData.description);
       submitData.append('material', formData.material);
-      submitData.append('color', formData.color);
+      submitData.append('color', formData.colors);
       submitData.append('quantity', formData.quantity);
       submitData.append('specialRequirements', formData.specialRequirements);
 
@@ -250,7 +250,7 @@ const ExploreCollection = () => {
                     <input
                       type="text"
                       name="color"
-                      value={formData.color}
+                      value={formData.colors}
                       onChange={handleInputChange}
                       placeholder="e.g., Red, Blue, White, or leave blank for default"
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"

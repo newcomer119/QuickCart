@@ -38,24 +38,37 @@ export async function POST(request) {
         const description = formData.get('description');
         const additionalInfo = formData.get('additionalInfo');
         const category = formData.get('category');
+        const colorsJson = formData.get('colors');
         const price = formData.get('price');
         const offerPrice = formData.get('offerPrice');
         const files = formData.getAll('images');
 
         console.log("Files received:", files.length); // Debug log
-        console.log("Product details:", { name, description, category, price, offerPrice }); // Debug log
+        console.log("Product details:", { name, description, category, colors: colorsJson, price, offerPrice }); // Debug log
 
         if (!files || files.length === 0) {
             console.log("No files found in request"); // Debug log
             return NextResponse.json({ success: false, message: "No files uploaded" });
         }
 
+        // Parse colors from JSON string
+        let colors = [];
+        try {
+            colors = JSON.parse(colorsJson);
+        } catch (error) {
+            console.log("Error parsing colors JSON"); // Debug log
+            return NextResponse.json({ 
+                success: false, 
+                message: "Invalid colors data" 
+            }, { status: 400 });
+        }
+
         // Validate required fields
-        if (!name || !description || !category || !price || !offerPrice) {
+        if (!name || !description || !category || !colors || colors.length === 0 || !price || !offerPrice) {
             console.log("Missing required fields"); // Debug log
             return NextResponse.json({ 
                 success: false, 
-                message: "All fields are required" 
+                message: "All fields are required and at least one color must be selected" 
             }, { status: 400 });
         }
 
@@ -94,12 +107,17 @@ export async function POST(request) {
         await connectDb();
         console.log("Database connected"); // Debug log
 
+        console.log("About to create product with colors:", colors); // Debug log - show colors array
+        console.log("Colors type:", typeof colors); // Debug log - show colors type
+        console.log("Colors length:", colors.length); // Debug log - show colors length
+
         const newProduct = await Product.create({
             userId,
             name,
             description,
             additionalInfo,
             category,
+            colors,
             price: Number(price),
             offerPrice: Number(offerPrice),
             image: images,
@@ -107,6 +125,7 @@ export async function POST(request) {
         });
 
         console.log("Product created successfully:", newProduct._id); // Debug log
+        console.log("Created product data:", JSON.stringify(newProduct, null, 2)); // Debug log - show full product data
 
         return NextResponse.json({ 
             success: true, 

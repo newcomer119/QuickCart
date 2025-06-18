@@ -20,11 +20,20 @@ const Product = () => {
   const [mainImage, setMainImage] = useState(null);
   const [productData, setProductData] = useState(null);
   const [isProductLoading, setIsProductLoading] = useState(true);
+  const [selectedColor, setSelectedColor] = useState('');
 
   const fetchProductData = async () => {
     setIsProductLoading(true);
     const product = products.find((product) => product._id === id);
     setProductData(product);
+    if (product && product.colors) {
+      if (Array.isArray(product.colors) && product.colors.length > 0) {
+        setSelectedColor(product.colors[0]); // Set first color as default
+      } else if (typeof product.colors === 'string') {
+        const firstColor = product.colors.split(/(?=[A-Z])/)[0];
+        setSelectedColor(firstColor);
+      }
+    }
     setIsProductLoading(false);
   };
 
@@ -47,6 +56,52 @@ const Product = () => {
 
     return () => clearTimeout(timeout);
   }, [setIsLoading]);
+
+  const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please login first to add items to cart");
+      appRouter.push('/');
+      return;
+    }
+    
+    // Check if color selection is needed
+    const hasMultipleColors = productData.colors && (
+      (Array.isArray(productData.colors) && productData.colors.length > 1) ||
+      (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
+    );
+    
+    if (hasMultipleColors && !selectedColor) {
+      toast.error("Please select a color");
+      return;
+    }
+    
+    addToCart(productData._id, selectedColor);
+  };
+
+  const handleBuyNow = () => {
+    if (!user) {
+      toast.error("Please login first to buy products");
+      appRouter.push('/');
+      return;
+    }
+    
+    // Check if color selection is needed
+    const hasMultipleColors = productData.colors && (
+      (Array.isArray(productData.colors) && productData.colors.length > 1) ||
+      (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
+    );
+    
+    if (hasMultipleColors && !selectedColor) {
+      toast.error("Please select a color");
+      return;
+    }
+    
+    const cartKey = selectedColor ? `${productData._id}_${selectedColor}` : productData._id;
+    if (!cartItems[cartKey]) {
+      addToCart(productData._id, selectedColor);
+    }
+    appRouter.push("/cart");
+  };
 
   if (isProductLoading) {
     return <Loading />;
@@ -148,6 +203,54 @@ const Product = () => {
               </span>
             </p>
             <hr className="bg-gray-600 my-6" />
+            
+            {/* Color Selection */}
+            {productData.colors && (
+              <div className="mb-6">
+                <p className="text-base font-medium mb-3">Select Color:</p>
+                <div className="flex flex-wrap gap-2">
+                  {Array.isArray(productData.colors) ? (
+                    // If colors is an array
+                    productData.colors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                          selectedColor === color
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))
+                  ) : (
+                    // If colors is a string, split it
+                    productData.colors.split(/(?=[A-Z])/).map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                          selectedColor === color
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))
+                  )}
+                </div>
+                {selectedColor && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    Selected: <span className="font-medium">{selectedColor}</span>
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Debug info - remove this later */}
+           
             <div className="overflow-x-auto">
               <table className="table-auto border-collapse w-full max-w-72">
                 <tbody>
@@ -157,7 +260,19 @@ const Product = () => {
                   </tr>
                   <tr>
                     <td className="text-gray-600 font-medium">Color</td>
-                    <td className="text-gray-800/50 ">Multi</td>
+                    <td className="text-gray-800/50 ">
+                      {productData.colors && (
+                        Array.isArray(productData.colors) 
+                          ? (productData.colors.length > 1 
+                              ? `${productData.colors.length} colors available`
+                              : productData.colors[0]
+                            )
+                          : (productData.colors.split(/(?=[A-Z])/).length > 1
+                              ? `${productData.colors.split(/(?=[A-Z])/).length} colors available`
+                              : productData.colors
+                            )
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td className="text-gray-600 font-medium">Category</td>
@@ -169,30 +284,13 @@ const Product = () => {
 
             <div className="flex items-center mt-10 gap-4">
               <button
-                onClick={() => {
-                  if (!user) {
-                    toast.error("Please login first to add items to cart");
-                    appRouter.push('/');
-                    return;
-                  }
-                  addToCart(productData._id);
-                }}
+                onClick={handleAddToCart}
                 className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition"
               >
                 Add to Cart
               </button>
               <button
-                onClick={() => {
-                  if (!user) {
-                    toast.error("Please login first to buy products");
-                    appRouter.push('/');
-                    return;
-                  }
-                  if (!cartItems[productData._id]) {
-                    addToCart(productData._id);
-                  }
-                  appRouter.push("/cart");
-                }}
+                onClick={handleBuyNow}
                 className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition"
               >
                 Buy now

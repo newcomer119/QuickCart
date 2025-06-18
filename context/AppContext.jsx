@@ -72,7 +72,7 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  const addToCart = async (itemId) => {
+  const addToCart = async (itemId, selectedColor = null) => {
     if (!user) {
       toast.error("Please login first to add items to cart");
       router.push('/');
@@ -80,11 +80,16 @@ export const AppContextProvider = (props) => {
     }
 
     let cartData = structuredClone(cartItems);
-    if (cartData[itemId]) {
+    const cartKey = selectedColor ? `${itemId}_${selectedColor}` : itemId;
+    
+    if (cartData[cartKey]) {
       // If item already in cart, do not increment, just confirm
       toast.success("Item is already in your cart");
     } else {
-      cartData[itemId] = 1;
+      cartData[cartKey] = {
+        quantity: 1,
+        color: selectedColor
+      };
       setCartItems(cartData);
       if (user) {
         try {
@@ -103,12 +108,17 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  const updateCartQuantity = async (itemId, quantity) => {
+  const updateCartQuantity = async (itemId, quantity, selectedColor = null) => {
     let cartData = structuredClone(cartItems);
+    const cartKey = selectedColor ? `${itemId}_${selectedColor}` : itemId;
+    
     if (quantity === 0) {
-      delete cartData[itemId];
+      delete cartData[cartKey];
     } else {
-      cartData[itemId] = quantity;
+      cartData[cartKey] = {
+        quantity: quantity,
+        color: selectedColor
+      };
     }
     setCartItems(cartData);
     if(user){
@@ -125,8 +135,8 @@ export const AppContextProvider = (props) => {
   const getCartCount = () => {
     let totalCount = 0;
     for (const items in cartItems) {
-      if (cartItems[items] > 0) {
-        totalCount += cartItems[items];
+      if (cartItems[items] && cartItems[items].quantity > 0) {
+        totalCount += cartItems[items].quantity;
       }
     }
     return totalCount;
@@ -135,9 +145,12 @@ export const AppContextProvider = (props) => {
   const getCartAmount = () => {
     let totalAmount = 0;
     for (const items in cartItems) {
-      let itemInfo = products.find((product) => product._id === items);
-      if (cartItems[items] > 0) {
-        totalAmount += itemInfo.offerPrice * cartItems[items];
+      if (cartItems[items] && cartItems[items].quantity > 0) {
+        const itemId = items.split('_')[0]; // Extract itemId from cartKey
+        let itemInfo = products.find((product) => product._id === itemId);
+        if (itemInfo) {
+          totalAmount += itemInfo.offerPrice * cartItems[items].quantity;
+        }
       }
     }
     return Math.floor(totalAmount * 100) / 100;

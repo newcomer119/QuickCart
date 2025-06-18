@@ -9,10 +9,14 @@ const productSchema = new mongoose.Schema({
     offerPrice: { type: Number, required: true },
     image: { type: [String], required: true },
     category: { type: String, required: true },
+    colors: { type: [String], required: true },
     date: { type: Number, required: true }
 }, { timestamps: true });
 
-// Check if the model exists before creating a new one
-const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+// Force model recreation to ensure schema changes are applied
+if (mongoose.models.Product) {
+    delete mongoose.models.Product;
+}
+const Product = mongoose.model('Product', productSchema);
 
 export default Product;
