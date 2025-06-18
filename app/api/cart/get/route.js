@@ -1,20 +1,39 @@
 import connectDb from "@/config/db";
+import User from "@/models/Users";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-
 export async function GET(request) {
     try{
-        const {userId} = getAuth()
+        const {userId} = getAuth(request)
+
+        if (!userId) {
+            return NextResponse.json({ 
+                success: false, 
+                message: "User not authenticated" 
+            }, { status: 401 });
+        }
 
         await connectDb()
         const user = await User.findById(userId)
 
-        const{cartItems} = user
+        if (!user) {
+            return NextResponse.json({ 
+                success: false, 
+                message: "User not found" 
+            }, { status: 404 });
+        }
 
-        return NextResponse.json({ success : true, cartItems})
+        const {cartItems} = user
+
+        return NextResponse.json({ success: true, cartItems})
 
     }catch(error){
-        return NextResponse.json({success : false, message : error.message})
+        console.error("Error in cart get route:", error);
+        return NextResponse.json({
+            success: false, 
+            message: "Failed to fetch cart items",
+            error: error.message
+        }, { status: 500 });
     }
 }
