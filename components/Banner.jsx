@@ -13,10 +13,10 @@ const Banner = () => {
   return (
     <div className="flex flex-col items-center justify-center text-center space-y-6 bg-[#E6E9F2] my-16 rounded-xl p-12">
       <h2 className="text-3xl md:text-4xl font-semibold max-w-[600px]">
-        Transform Your Ideas into 3D Reality
+        Create Your Own Custom 3D Design
       </h2>
       <p className="max-w-[500px] font-medium text-gray-800/60 text-lg">
-        Discover our premium collection of 3D printing filaments, custom designs, and professional-grade equipment
+        Upload your design files and let us bring your custom creations to life with our premium 3D printing service
       </p>
       <button 
         onClick={handleShopNow}
