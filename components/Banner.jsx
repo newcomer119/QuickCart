@@ -7,7 +7,7 @@ const Banner = () => {
   const router = useRouter();
 
   const handleShopNow = () => {
-    router.push('/all-products');
+    router.push('/explore-collection');
   };
 
   return (
