@@ -4,10 +4,19 @@ import DesignRequest from "@/models/DesignRequest";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
     try {
         const { userId } = getAuth(request);
-        const { id } = params;
+        
+        // Extract id from context params
+        const id = context?.params?.id;
+        
+        if (!id) {
+            return NextResponse.json({ 
+                success: false, 
+                message: "Invalid request: Missing design request ID" 
+            }, { status: 400 });
+        }
         
         if (!userId) {
             return NextResponse.json({ success: false, message: "Not authenticated" });
