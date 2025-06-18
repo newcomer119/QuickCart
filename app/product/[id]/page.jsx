@@ -133,11 +133,7 @@ const Product = () => {
                     appRouter.push('/');
                     return;
                   }
-                  if (cartItems[productData._id]) {
-                    appRouter.push("/cart");
-                  } else {
-                    addToCart(productData._id);
-                  }
+                  addToCart(productData._id);
                 }}
                 className="w-full py-3.5 bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition"
               >
@@ -150,9 +146,7 @@ const Product = () => {
                     appRouter.push('/');
                     return;
                   }
-                  if (cartItems[productData._id]) {
-                    appRouter.push("/cart");
-                  } else {
+                  if (!cartItems[productData._id]) {
                     addToCart(productData._id);
                   }
                   appRouter.push("/cart");

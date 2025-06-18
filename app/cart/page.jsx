@@ -86,7 +86,7 @@ const Cart = () => {
                             />
                           </button>
                           <input onChange={e => updateCartQuantity(product._id, Number(e.target.value))} type="number" value={cartItems[itemId]} className="w-8 border text-center appearance-none"></input>
-                          <button onClick={() => addToCart(product._id)}>
+                          <button onClick={() => updateCartQuantity(product._id, cartItems[itemId] + 1)}>
                             <Image
                               src={assets.increase_arrow}
                               alt="increase_arrow"
