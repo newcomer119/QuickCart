@@ -75,6 +75,9 @@ export const createUserOrder = inngest.createFunction(
         items: event.data.items,
         amount: event.data.amount,
         address: event.data.address,
+        paymentMethod: event.data.paymentMethod,
+        paymentStatus: event.data.paymentStatus || 'PENDING',
+        status: event.data.status || 'Order Placed',
         date: event.data.date,
         data: event.data // Include the entire data object
       }
