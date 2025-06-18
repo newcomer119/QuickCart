@@ -18,17 +18,34 @@ const EmailSender = ({ orderDetails }) => {
                     return;
                 }
 
-                // Format the items list
-                const formattedItems = orderDetails.items.map(item => 
-                    `${item.name} - Quantity: ${item.quantity} - Price: ₹${item.price}`
-                ).join('\n');
+                // Initialize EmailJS
+                emailjs.init('RU2yjSOjiC4ti0O1r');
+
+                // Format the items for the template
+                const orders = orderDetails.items.map(item => ({
+                    name: item.name,
+                    units: item.quantity,
+                    price: item.price,
+                    image_url: item.image || 'https://via.placeholder.com/64x64?text=Product' // fallback image
+                }));
+
+                // Calculate shipping and tax (you can adjust these values)
+                const shipping = 50; // Default shipping cost
+                const tax = Math.round(orderDetails.totalAmount * 0.18); // 18% tax
+                const subtotal = orderDetails.totalAmount - shipping - tax;
 
                 const templateParams = {
                     email: user.primaryEmailAddress.emailAddress,
+                    to_name: user?.fullName || user?.firstName || 'Customer',
+                    from_name: 'FilamentFreaks',
                     reply_to: 'freaksfilament@gmail.com',
-                    order_number: orderDetails.orderNumber,
-                    total_amount: `₹${orderDetails.totalAmount}`,
-                    items: formattedItems,
+                    order_id: orderDetails.orderNumber,
+                    orders: orders,
+                    cost: {
+                        shipping: shipping,
+                        tax: tax,
+                        total: orderDetails.totalAmount
+                    },
                     shipping_address: orderDetails.shippingAddress,
                     payment_method: orderDetails.paymentMethod
                 };
@@ -37,16 +54,48 @@ const EmailSender = ({ orderDetails }) => {
                 console.log('Template variables:', Object.keys(templateParams));
                 console.log('Recipient email:', templateParams.email);
 
-                const response = await emailjs.send(
-                    'service_ve6jerb',
-                    'template_n8fp1wm',
-                    templateParams,
-                    'H3OV5XwOyzlLlqydo'
-                );
-
-                console.log('Email sent successfully:', response);
-                console.log('Response status:', response.status);
-                console.log('Response text:', response.text);
+                // Try the send method first
+                try {
+                    const response = await emailjs.send(
+                        'service_ktyfsb8',
+                        'template_9dd766b',
+                        templateParams
+                    );
+                    console.log('Email sent successfully:', response);
+                    console.log('Response status:', response.status);
+                    console.log('Response text:', response.text);
+                } catch (sendError) {
+                    console.log('Send method failed, trying sendForm method...');
+                    
+                    // Create a temporary form element
+                    const form = document.createElement('form');
+                    form.style.display = 'none';
+                    
+                    // Add all template parameters as hidden inputs
+                    Object.keys(templateParams).forEach(key => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = typeof templateParams[key] === 'object' 
+                            ? JSON.stringify(templateParams[key]) 
+                            : templateParams[key];
+                        form.appendChild(input);
+                    });
+                    
+                    document.body.appendChild(form);
+                    
+                    const formResponse = await emailjs.sendForm(
+                        'service_ktyfsb8',
+                        'template_9dd766b',
+                        form
+                    );
+                    
+                    document.body.removeChild(form);
+                    
+                    console.log('Email sent successfully via sendForm:', formResponse);
+                    console.log('Response status:', formResponse.status);
+                    console.log('Response text:', formResponse.text);
+                }
             } catch (error) {
                 console.error('Error sending email:', error);
                 console.error('Error details:', {
