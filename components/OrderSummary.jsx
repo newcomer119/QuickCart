@@ -156,7 +156,23 @@ const OrderSummary = () => {
         return toast.error('Please select an address')
       }
 
-      let cartItemsArray = Object.keys(cartItems).map((key) => ({ product: key, quantity: cartItems[key] }))
+      // Convert cart items to order format, handling both old and new cart structures
+      let cartItemsArray = Object.keys(cartItems).map((cartKey) => {
+        const cartItem = cartItems[cartKey];
+        
+        // Handle both old format (number) and new format (object)
+        if (typeof cartItem === 'number') {
+          return { product: cartKey, quantity: cartItem };
+        } else {
+          // New format: {quantity: number, color: string}
+          return { 
+            product: cartKey, 
+            quantity: cartItem.quantity,
+            color: cartItem.color 
+          };
+        }
+      });
+      
       cartItemsArray = cartItemsArray.filter(item => item.quantity > 0)
 
       if (cartItemsArray.length === 0) {

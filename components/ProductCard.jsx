@@ -5,7 +5,7 @@ import { useAppContext } from '@/context/AppContext';
 import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
-    const { currency, router, user, setIsLoading } = useAppContext()
+    const { currency, router, user, setIsLoading, cartItems } = useAppContext()
 
     const handleProductClick = () => {
         setIsLoading(true);
@@ -22,6 +22,22 @@ const ProductCard = ({ product }) => {
         }
         setIsLoading(true);
         router.push('/product/' + product._id);
+    };
+
+    // Check if this product is in cart (handle both old and new cart structure)
+    const isInCart = () => {
+        // Check for exact product match (old format)
+        if (cartItems[product._id]) {
+            return true;
+        }
+        
+        // Check for color variants (new format)
+        if (product.colors) {
+            const colors = Array.isArray(product.colors) ? product.colors : product.colors.split(/(?=[A-Z])/);
+            return colors.some(color => cartItems[`${product._id}_${color}`]);
+        }
+        
+        return false;
     };
 
     return (

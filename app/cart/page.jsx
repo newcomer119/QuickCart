@@ -40,13 +40,20 @@ const Cart = () => {
                 </tr>
               </thead>
               <tbody>
-                {Object.keys(cartItems).map((itemId) => {
-                  const product = products.find(product => product._id === itemId);
+                {Object.keys(cartItems).map((cartKey) => {
+                  // Extract productId and color from cartKey (format: productId_color or just productId)
+                  const [productId, selectedColor] = cartKey.includes('_') ? cartKey.split('_') : [cartKey, null];
+                  const product = products.find(product => product._id === productId);
+                  const cartItem = cartItems[cartKey];
 
-                  if (!product || cartItems[itemId] <= 0) return null;
+                  // Handle both old format (number) and new format (object)
+                  const quantity = typeof cartItem === 'number' ? cartItem : cartItem?.quantity || 0;
+                  const color = typeof cartItem === 'object' ? cartItem?.color : null;
+
+                  if (!product || quantity <= 0) return null;
 
                   return (
-                    <tr key={itemId}>
+                    <tr key={cartKey}>
                       <td className="flex items-center gap-4 py-4 md:px-4 px-1">
                         <div>
                           <div className="rounded-lg overflow-hidden bg-gray-500/10 p-2">
@@ -60,16 +67,19 @@ const Cart = () => {
                           </div>
                           <button
                             className="md:hidden text-xs text-orange-600 mt-1"
-                            onClick={() => updateCartQuantity(product._id, 0)}
+                            onClick={() => updateCartQuantity(productId, 0, color)}
                           >
                             Remove
                           </button>
                         </div>
                         <div className="text-sm hidden md:block">
                           <p className="text-gray-800">{product.name}</p>
+                          {color && (
+                            <p className="text-xs text-gray-600 mt-1">Color: {color}</p>
+                          )}
                           <button
                             className="text-xs text-orange-600 mt-1"
-                            onClick={() => updateCartQuantity(product._id, 0)}
+                            onClick={() => updateCartQuantity(productId, 0, color)}
                           >
                             Remove
                           </button>
@@ -78,15 +88,20 @@ const Cart = () => {
                       <td className="py-4 md:px-4 px-1 text-gray-600">₹{product.offerPrice}</td>
                       <td className="py-4 md:px-4 px-1">
                         <div className="flex items-center md:gap-2 gap-1">
-                          <button onClick={() => updateCartQuantity(product._id, cartItems[itemId] - 1)}>
+                          <button onClick={() => updateCartQuantity(productId, quantity - 1, color)}>
                             <Image
                               src={assets.decrease_arrow}
                               alt="decrease_arrow"
                               className="w-4 h-4"
                             />
                           </button>
-                          <input onChange={e => updateCartQuantity(product._id, Number(e.target.value))} type="number" value={cartItems[itemId]} className="w-8 border text-center appearance-none"></input>
-                          <button onClick={() => updateCartQuantity(product._id, cartItems[itemId] + 1)}>
+                          <input 
+                            onChange={e => updateCartQuantity(productId, Number(e.target.value), color)} 
+                            type="number" 
+                            value={quantity} 
+                            className="w-8 border text-center appearance-none"
+                          />
+                          <button onClick={() => updateCartQuantity(productId, quantity + 1, color)}>
                             <Image
                               src={assets.increase_arrow}
                               alt="increase_arrow"
@@ -95,7 +110,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-gray-600">₹{(product.offerPrice * cartItems[itemId]).toFixed(2)}</td>
+                      <td className="py-4 md:px-4 px-1 text-gray-600">₹{(product.offerPrice * quantity).toFixed(2)}</td>
                     </tr>
                   );
                 })}
