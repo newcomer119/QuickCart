@@ -3,10 +3,23 @@ import ProductCard from "@/components/ProductCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAppContext } from "@/context/AppContext";
+import { useEffect } from "react";
 
 const AllProducts = () => {
 
-    const { products } = useAppContext();
+    const { products, setIsLoading } = useAppContext();
+
+    useEffect(() => {
+        // Stop loading immediately when page loads
+        setIsLoading(false);
+        
+        // Fallback: stop loading after 3 seconds to prevent infinite loading
+        const timeout = setTimeout(() => {
+            setIsLoading(false);
+        }, 3000);
+
+        return () => clearTimeout(timeout);
+    }, [setIsLoading]);
 
     return (
         <>

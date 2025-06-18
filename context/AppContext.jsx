@@ -22,6 +22,7 @@ export const AppContextProvider = (props) => {
   const [userData, setUserData] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchProductData = async () => {
     try {
@@ -170,6 +171,8 @@ export const AppContextProvider = (props) => {
     getCartCount,
     getCartAmount,
     signIn,
+    isLoading,
+    setIsLoading,
   };
 
   return (

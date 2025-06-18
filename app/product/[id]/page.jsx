@@ -15,21 +15,63 @@ const Product = () => {
   const { id } = useParams();
   const router = useRouter();
 
-  const { products, router: appRouter, addToCart, user, cartItems } = useAppContext();
+  const { products, router: appRouter, addToCart, user, cartItems, setIsLoading } = useAppContext();
 
   const [mainImage, setMainImage] = useState(null);
   const [productData, setProductData] = useState(null);
+  const [isProductLoading, setIsProductLoading] = useState(true);
 
   const fetchProductData = async () => {
+    setIsProductLoading(true);
     const product = products.find((product) => product._id === id);
     setProductData(product);
+    setIsProductLoading(false);
   };
 
   useEffect(() => {
     fetchProductData();
   }, [id, products.length]);
 
-  return productData ? (
+  useEffect(() => {
+    // Stop loading when product data is processed (found or not found)
+    if (!isProductLoading) {
+      setIsLoading(false);
+    }
+  }, [isProductLoading, setIsLoading]);
+
+  // Fallback: stop loading after 5 seconds to prevent infinite loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [setIsLoading]);
+
+  if (isProductLoading) {
+    return <Loading />;
+  }
+
+  if (!productData) {
+    return (
+      <>
+        <Navbar />
+        <div className="flex flex-col items-center justify-center min-h-[70vh] px-6">
+          <h1 className="text-2xl font-medium text-gray-800 mb-4">Product Not Found</h1>
+          <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
+          <button 
+            onClick={() => router.push('/all-products')}
+            className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
+          >
+            Browse All Products
+          </button>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  return (
     <>
       <Navbar />
       <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
@@ -181,8 +223,6 @@ const Product = () => {
       </div>
       <Footer />
     </>
-  ) : (
-    <Loading />
   );
 };
 

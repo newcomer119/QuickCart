@@ -5,7 +5,13 @@ import { useAppContext } from '@/context/AppContext';
 import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
-    const { currency, router, user } = useAppContext()
+    const { currency, router, user, setIsLoading } = useAppContext()
+
+    const handleProductClick = () => {
+        setIsLoading(true);
+        router.push('/product/' + product._id);
+        scrollTo(0, 0);
+    };
 
     const handleBuyNow = (e) => {
         e.stopPropagation();
@@ -14,12 +20,13 @@ const ProductCard = ({ product }) => {
             router.push('/');
             return;
         }
+        setIsLoading(true);
         router.push('/product/' + product._id);
     };
 
     return (
         <div
-            onClick={() => { router.push('/product/' + product._id); scrollTo(0, 0) }}
+            onClick={handleProductClick}
             className="flex flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer"
         >
             <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center">
