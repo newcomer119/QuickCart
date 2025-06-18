@@ -22,7 +22,7 @@ const Banner = () => {
         onClick={handleShopNow}
         className="group flex items-center justify-center gap-2 px-12 py-3 bg-orange-600 rounded-full text-white hover:bg-orange-700 transition"
       >
-        Explore Collection
+        Make Your Own Designs
         <Image className="group-hover:translate-x-1 transition" src={assets.arrow_icon_white} alt="arrow_icon_white" />
       </button>
     </div>
