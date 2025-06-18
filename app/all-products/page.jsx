@@ -13,10 +13,10 @@ const AllProducts = () => {
         // Stop loading immediately when page loads
         setIsLoading(false);
         
-        // Fallback: stop loading after 3 seconds to prevent infinite loading
+        // Fallback: stop loading after 2 seconds to prevent infinite loading
         const timeout = setTimeout(() => {
             setIsLoading(false);
-        }, 3000);
+        }, 2000);
 
         return () => clearTimeout(timeout);
     }, [setIsLoading]);

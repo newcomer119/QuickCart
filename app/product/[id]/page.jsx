@@ -39,11 +39,11 @@ const Product = () => {
     }
   }, [isProductLoading, setIsLoading]);
 
-  // Fallback: stop loading after 5 seconds to prevent infinite loading
+  // Fallback: stop loading after 3 seconds to prevent infinite loading
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsLoading(false);
-    }, 5000);
+    }, 3000);
 
     return () => clearTimeout(timeout);
   }, [setIsLoading]);
