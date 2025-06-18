@@ -33,6 +33,11 @@ const HeaderSlider = () => {
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,6 +54,31 @@ const HeaderSlider = () => {
     router.push('/all-products');
   };
 
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      // Swipe left - go to next slide
+      setCurrentSlide((prev) => (prev + 1) % sliderData.length);
+    } else if (isRightSwipe) {
+      // Swipe right - go to previous slide
+      setCurrentSlide((prev) => (prev - 1 + sliderData.length) % sliderData.length);
+    }
+  };
+
   return (
     <div className="overflow-hidden relative w-full">
       <div
@@ -56,6 +86,9 @@ const HeaderSlider = () => {
         style={{
           transform: `translateX(-${currentSlide * 100}%)`,
         }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
         {sliderData.map((slide, index) => (
           <div
