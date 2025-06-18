@@ -9,7 +9,7 @@ const designRequestSchema = new mongoose.Schema({
     quantity: { type: Number, required: true, min: 1, max: 100 },
     specialRequirements: { type: String },
     fileName: { type: String, required: true },
-    filePath: { type: String, required: true },
+    fileUrl: { type: String, required: true },
     status: { 
         type: String, 
         required: true, 
@@ -21,9 +21,31 @@ const designRequestSchema = new mongoose.Schema({
     adminNotes: { type: String },
     date: { type: Number, required: true }
 }, {
-    timestamps: true
+    timestamps: true,
+    strict: true
 });
 
-const DesignRequest = mongoose.models.designRequest || mongoose.model('designRequest', designRequestSchema);
+// Pre-save hook to ensure no filePath field is saved
+designRequestSchema.pre('save', function(next) {
+    if (this.filePath) {
+        delete this.filePath;
+    }
+    next();
+});
+
+// Pre-validate hook to ensure filePath is not required
+designRequestSchema.pre('validate', function(next) {
+    if (this.filePath) {
+        delete this.filePath;
+    }
+    next();
+});
+
+// Force recompilation of the model
+if (mongoose.models.designRequest) {
+    delete mongoose.models.designRequest;
+}
+
+const DesignRequest = mongoose.model('designRequest', designRequestSchema);
 
 export default DesignRequest;

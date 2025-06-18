@@ -69,22 +69,12 @@ const DesignRequests = () => {
         return;
       }
 
-      const response = await axios.get(`/api/design-request/${requestId}/download`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob'
-      });
+      // Open the download URL in a new tab/window
+      // This will trigger the download from Cloudinary
+      const downloadUrl = `/api/design-request/${requestId}/download`;
+      window.open(downloadUrl, '_blank');
 
-      // Create a download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      toast.success("File downloaded successfully");
+      toast.success("Download started");
     } catch (error) {
       console.error("Error downloading file:", error);
       toast.error("Error downloading file");

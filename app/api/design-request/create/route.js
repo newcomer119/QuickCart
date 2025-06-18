@@ -2,8 +2,14 @@ import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import connectDb from "@/config/db";
 import DesignRequest from "@/models/DesignRequest";
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request) {
     try {
@@ -47,19 +53,23 @@ export async function POST(request) {
         const timestamp = Date.now();
         const uniqueFileName = `${userId}_${timestamp}_${fileName}`;
         
-        // Save file to uploads directory
-        const uploadsDir = path.join(process.cwd(), 'uploads', 'designs');
-        const filePath = path.join(uploadsDir, uniqueFileName);
+        // Convert file to buffer
+        const fileBuffer = Buffer.from(await file.arrayBuffer());
         
-        // Ensure uploads directory exists
-        try {
-            await mkdir(uploadsDir, { recursive: true });
-        } catch (error) {
-            console.error('Error creating directory:', error);
-            return NextResponse.json({ success: false, message: 'Error creating upload directory' });
-        }
-        
-        await writeFile(filePath, Buffer.from(await file.arrayBuffer()));
+        // Upload to Cloudinary
+        const uploadResult = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    resource_type: 'raw',
+                    public_id: `designs/${uniqueFileName}`,
+                    format: fileExtension.substring(1), // Remove the dot
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(fileBuffer);
+        });
 
         // Create design request in database
         const designRequest = await DesignRequest.create({
@@ -71,7 +81,7 @@ export async function POST(request) {
             quantity,
             specialRequirements,
             fileName: uniqueFileName,
-            filePath: filePath,
+            fileUrl: uploadResult.secure_url,
             status: 'PENDING',
             date: Date.now()
         });
