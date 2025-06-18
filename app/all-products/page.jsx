@@ -33,7 +33,43 @@ const AllProducts = () => {
         }
     }, [products, selectedColor]);
 
-    const colors = ['All', 'Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Pink', 'Orange', 'Gray', 'Silver', 'Gold', 'Brown', 'Multi'];
+    const colors = [
+        'All', 
+        'Pitch black',
+        'Pure white', 
+        'Lemon yellow',
+        'Mauve purple',
+        'Nuclear red',
+        'Outrageous orange',
+        'Atomic pink',
+        'Royal blue',
+        'Light grey',
+        'Light blue',
+        'Grass green',
+        'Beige brown',
+        'Teal blue',
+        'Army green',
+        'Dark grey',
+        'Ivory white',
+        'Rust copper',
+        'Appricot',
+        'Lagoon blue',
+        'Forest green',
+        'Fluorescent orange',
+        'Fluorescent green',
+        'Transparent',
+        'Bhama yellow',
+        'Chocolate brown',
+        'Fluorescent yellow',
+        'Levender violet',
+        'Magenta',
+        'Military khaki',
+        'Ryobix green',
+        'Simply silver',
+        'Midnight grey',
+        'Thanos purple',
+        'Cool( lithopane ) white'
+    ];
 
     return (
         <>

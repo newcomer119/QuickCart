@@ -1,4 +1,4 @@
- "use client";
+"use client";
 import React, { useState } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
@@ -15,11 +15,48 @@ const ExploreCollection = () => {
     designName: "",
     description: "",
     material: "PLA",
-    color: "",
+    color: "Pitch black",
     quantity: 1,
     specialRequirements: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const availableColors = [
+    'Pitch black',
+    'Pure white', 
+    'Lemon yellow',
+    'Mauve purple',
+    'Nuclear red',
+    'Outrageous orange',
+    'Atomic pink',
+    'Royal blue',
+    'Light grey',
+    'Light blue',
+    'Grass green',
+    'Beige brown',
+    'Teal blue',
+    'Army green',
+    'Dark grey',
+    'Ivory white',
+    'Rust copper',
+    'Appricot',
+    'Lagoon blue',
+    'Forest green',
+    'Fluorescent orange',
+    'Fluorescent green',
+    'Transparent',
+    'Bhama yellow',
+    'Chocolate brown',
+    'Fluorescent yellow',
+    'Levender violet',
+    'Magenta',
+    'Military khaki',
+    'Ryobix green',
+    'Simply silver',
+    'Midnight grey',
+    'Thanos purple',
+    'Cool( lithopane ) white'
+  ];
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -81,7 +118,7 @@ const ExploreCollection = () => {
       submitData.append('designName', formData.designName);
       submitData.append('description', formData.description);
       submitData.append('material', formData.material);
-      submitData.append('color', formData.colors);
+      submitData.append('color', formData.color);
       submitData.append('quantity', formData.quantity);
       submitData.append('specialRequirements', formData.specialRequirements);
 
@@ -99,7 +136,7 @@ const ExploreCollection = () => {
           designName: "",
           description: "",
           material: "PLA",
-          color: "",
+          color: "Pitch black",
           quantity: 1,
           specialRequirements: "",
         });
@@ -247,14 +284,16 @@ const ExploreCollection = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Color Preference
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="color"
-                      value={formData.colors}
+                      value={formData.color}
                       onChange={handleInputChange}
-                      placeholder="e.g., Red, Blue, White, or leave blank for default"
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
+                    >
+                      {availableColors.map((color) => (
+                        <option key={color} value={color}>{color}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>

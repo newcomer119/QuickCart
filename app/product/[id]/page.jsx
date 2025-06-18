@@ -205,7 +205,7 @@ const Product = () => {
             <hr className="bg-gray-600 my-6" />
             
             {/* Color Selection */}
-            {productData.colors && (
+            {productData.colors && productData.colors.length > 0 ? (
               <div className="mb-6">
                 <p className="text-base font-medium mb-3">Select Color:</p>
                 <div className="flex flex-wrap gap-2">
@@ -247,6 +247,11 @@ const Product = () => {
                   </p>
                 )}
               </div>
+            ) : (
+              <div className="mb-6">
+                <p className="text-base font-medium mb-3">Color:</p>
+                <p className="text-gray-600">No different colors</p>
+              </div>
             )}
 
             {/* Debug info - remove this later */}
@@ -261,7 +266,7 @@ const Product = () => {
                   <tr>
                     <td className="text-gray-600 font-medium">Color</td>
                     <td className="text-gray-800/50 ">
-                      {productData.colors && (
+                      {productData.colors && productData.colors.length > 0 ? (
                         Array.isArray(productData.colors) 
                           ? (productData.colors.length > 1 
                               ? `${productData.colors.length} colors available`
@@ -271,6 +276,8 @@ const Product = () => {
                               ? `${productData.colors.split(/(?=[A-Z])/).length} colors available`
                               : productData.colors
                             )
+                      ) : (
+                        "No different colors"
                       )}
                     </td>
                   </tr>
