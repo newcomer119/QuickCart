@@ -51,10 +51,10 @@ export default function ContactPage() {
           <div className="mt-10">
             <span className="font-bold text-xl">FOLLOW US</span>
             <div className="flex gap-5 mt-4 text-2xl">
-              <a href="#" aria-label="Facebook" className="hover:text-pink-600"><FaFacebook /></a>
-              <a href="#" aria-label="Twitter" className="hover:text-pink-600"><FaTwitter /></a>
-              <a href="#" aria-label="Instagram" className="hover:text-pink-600"><FaInstagram /></a>
-              <a href="#" aria-label="YouTube" className="hover:text-pink-600"><FaYoutube /></a>
+              <a href="https://www.facebook.com/share/19QKk73BaA/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-pink-600"><FaFacebook /></a>
+              <a href="https://x.com/filament_freaks?s=21" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="hover:text-pink-600"><FaTwitter /></a>
+              <a href="https://www.instagram.com/freaksfilament?igsh=MTBzb3FtNm5paGd2Ng%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-pink-600"><FaInstagram /></a>
+              <a href="https://www.youtube.com/@filament_freaks" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="hover:text-pink-600"><FaYoutube /></a>
               <a href="#" aria-label="LinkedIn" className="hover:text-pink-600"><FaLinkedin /></a>
             </div>
           </div>
