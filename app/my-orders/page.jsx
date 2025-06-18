@@ -68,7 +68,7 @@ const MyOrders = () => {
                         <span className="font-medium text-base">
                           {order.items
                             .map(
-                              (item) => item.product.name + ` x ${item.quantity}`
+                              (item) => (item.product?.name || 'Product Name Unavailable') + ` x ${item.quantity}`
                             )
                             .join(", ")}
                         </span>
@@ -78,14 +78,14 @@ const MyOrders = () => {
                     <div>
                       <p>
                         <span className="font-medium">
-                          {order.address.fullName}
+                          {order.address?.fullName || 'Name Unavailable'}
                         </span>
                         <br />
-                        <span>{order.address.area}</span>
+                        <span>{order.address?.area || 'Area Unavailable'}</span>
                         <br />
-                        <span>{`${order.address.city}, ${order.address.state}`}</span>
+                        <span>{`${order.address?.city || 'City'}, ${order.address?.state || 'State'}`}</span>
                         <br />
-                        <span>{order.address.phoneNumber}</span>
+                        <span>{order.address?.phoneNumber || 'Phone Unavailable'}</span>
                       </p>
                     </div>
                     <p className="font-medium my-auto">
