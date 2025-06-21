@@ -30,8 +30,25 @@ const Footer = () => {
               <li>
                 <Link href="/contact" className="hover:underline transition">Contact us</Link>
               </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="w-1/2 flex items-center justify-start md:justify-center">
+          <div>
+            <h2 className="font-medium text-gray-900 mb-5">Policies</h2>
+            <ul className="text-sm space-y-2">
               <li>
-                <Link href="/policies" className="hover:underline transition">Privacy policy</Link>
+                <Link href="/policies/privacy" className="hover:underline transition">Privacy Policy</Link>
+              </li>
+              <li>
+                <Link href="/policies/terms" className="hover:underline transition">Terms & Conditions</Link>
+              </li>
+              <li>
+                <Link href="/policies/cancellation" className="hover:underline transition">Cancellation Policy</Link>
+              </li>
+              <li>
+                <Link href="/policies/shipping" className="hover:underline transition">Shipping & Delivery</Link>
               </li>
             </ul>
           </div>
