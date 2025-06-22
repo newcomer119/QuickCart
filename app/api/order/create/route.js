@@ -19,7 +19,8 @@ export async function POST(request) {
 
         // calculate amount using items
         const amount = await items.reduce(async (acc, item) => {
-            const product = await Product.findById(item.product)
+            const productId = item.product.split('_')[0];
+            const product = await Product.findById(productId);
             return await acc + product.offerPrice * item.quantity
         }, 0)
 
@@ -73,7 +74,8 @@ export async function POST(request) {
 
         // Get product details for email
         const itemsWithDetails = await Promise.all(items.map(async (item) => {
-            const product = await Product.findById(item.product);
+            const productId = item.product.split('_')[0];
+            const product = await Product.findById(productId);
             return {
                 name: product.name,
                 quantity: item.quantity,
