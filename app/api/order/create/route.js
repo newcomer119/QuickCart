@@ -21,6 +21,9 @@ export async function POST(request) {
         const amount = await items.reduce(async (acc, item) => {
             const productId = item.product.split('_')[0];
             const product = await Product.findById(productId);
+            if (!product) {
+                throw new Error(`Product not found for id: ${productId}`);
+            }
             return await acc + product.offerPrice * item.quantity
         }, 0)
 
@@ -76,6 +79,9 @@ export async function POST(request) {
         const itemsWithDetails = await Promise.all(items.map(async (item) => {
             const productId = item.product.split('_')[0];
             const product = await Product.findById(productId);
+            if (!product) {
+                throw new Error(`Product not found for id: ${productId}`);
+            }
             return {
                 name: product.name,
                 quantity: item.quantity,
