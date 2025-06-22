@@ -56,7 +56,11 @@ const ProductCard = ({ product }) => {
             </div>
 
             <p className="md:text-base font-medium pt-2 w-full truncate">{product.name}</p>
-            <p className="w-full text-xs text-gray-500/70 max-sm:hidden truncate">{product.description}</p>
+            <p className="w-full text-xs text-gray-500/70 max-sm:hidden truncate">{
+              product.description && product.description.length > 50
+                ? product.description.slice(0, 50) + '...'
+                : product.description
+            }</p>
             <p className="w-full text-xs text-gray-500/70 max-sm:hidden">
               Color: {product.colors && product.colors.length > 0 
                 ? (Array.isArray(product.colors) 
@@ -94,7 +98,11 @@ const ProductCard = ({ product }) => {
                 <div className="flex flex-col w-full">
                     <p className="text-xs text-gray-500/80">Category: {product.category}</p>
                     {product.additionalInfo && (
-                        <p className="text-xs text-gray-500/80">{product.additionalInfo}</p>
+                        <p className="text-xs text-gray-500/80">{
+                          product.additionalInfo.length > 40
+                            ? product.additionalInfo.slice(0, 40) + '...'
+                            : product.additionalInfo
+                        }</p>
                     )}
                     <p className="text-base font-medium mt-1">{currency}{product.offerPrice}</p>
                 </div>
