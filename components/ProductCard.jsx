@@ -91,7 +91,13 @@ const ProductCard = ({ product }) => {
             </div>
 
             <div className="flex items-end justify-between w-full mt-1">
-                <p className="text-base font-medium">{currency}{product.offerPrice}</p>
+                <div className="flex flex-col w-full">
+                    <p className="text-xs text-gray-500/80">Category: {product.category}</p>
+                    {product.additionalInfo && (
+                        <p className="text-xs text-gray-500/80">{product.additionalInfo}</p>
+                    )}
+                    <p className="text-base font-medium mt-1">{currency}{product.offerPrice}</p>
+                </div>
                 <button 
                     onClick={handleBuyNow}
                     className="max-sm:hidden px-4 py-1.5 text-gray-500 border border-gray-500/20 rounded-full text-xs hover:bg-slate-50 transition"
