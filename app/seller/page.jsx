@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 const AddProduct = () => {
-  const {getToken} = useAppContext()
+  const {getToken, setIsLoading} = useAppContext()
   const [files, setFiles] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -94,19 +94,20 @@ const AddProduct = () => {
     });
 
     try {
+      setIsLoading(true); // Start loading
       const token = await getToken();
       if (!token) {
         toast.error("Authentication token not found");
+        setIsLoading(false); // Stop loading
         return;
       }
-
       const { data } = await axios.post('/api/product/add', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
-
+      setIsLoading(false); // Stop loading
       if (data.success) {
         toast.success(data.message);
         // Reset form
@@ -122,6 +123,7 @@ const AddProduct = () => {
         toast.error(data.message);
       }
     } catch (error) {
+      setIsLoading(false); // Stop loading on error
       console.error("Error uploading product:", error);
       toast.error(error.message || "Error uploading product");
     }
