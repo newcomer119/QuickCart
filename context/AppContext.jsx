@@ -136,7 +136,10 @@ export const AppContextProvider = (props) => {
     let totalCount = 0;
     for (const items in cartItems) {
       if (cartItems[items] && cartItems[items].quantity > 0) {
-        totalCount += cartItems[items].quantity;
+        const itemId = items.split('_')[0];
+        if (products.find(product => product._id === itemId)) {
+          totalCount += cartItems[items].quantity;
+        }
       }
     }
     return totalCount;
