@@ -8,8 +8,8 @@ const HeaderSlider = () => {
   const sliderData = [
     {
       id: 1,
-      title: "Bringing Ideas to life, Layer by Layer",
-      offer: "Professional 3D Solutions State-of-the-art 3D solutions for professional results",
+      title:  "Professional 3D Solutions State-of-the-art 3D solutions for professional results",
+      offer: "Bringing Ideas to life, Layer by Layer",
       buttonText1: "Shop now",
       buttonText2: "Find more",
       imgSrc: assets.Printer,

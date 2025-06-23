@@ -8,7 +8,7 @@ const products = [
     id: 1,
     image: assets.girl_with_headphone_image,
     title: "Premium 3D Products",
-    description: "High-quality filaments for perfect life every time.",
+    description: "High-quality products for perfect life every time.",
   },
   {
     id: 2,
