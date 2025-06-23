@@ -20,7 +20,7 @@ const products = [
     id: 3,
     image: assets.boy_with_laptop_image,
     title: "Professional 3D Printers",
-    description: "State-of-the-art 3D printers for professional results.",
+    description: "State-of-the-art 3D solutions for professional results.",
   },
 ];
 
