@@ -51,9 +51,11 @@ import banner2 from "./banner2.png"
 import banner3 from "./banner3.png"
 import kitchen from "./kitchen.jpg"
 import Laptop from "./Laptop.jpg"
+import Printer from "./printerrm.png"
 
 export const assets = {
   logo,
+  Printer,
   kitchen,
   Laptop,
   search_icon,

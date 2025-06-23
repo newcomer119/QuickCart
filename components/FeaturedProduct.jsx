@@ -7,8 +7,8 @@ const products = [
   {
     id: 1,
     image: assets.girl_with_headphone_image,
-    title: "Premium 3D Filaments",
-    description: "High-quality filaments for perfect prints every time.",
+    title: "Premium 3D Products",
+    description: "High-quality filaments for perfect life every time.",
   },
   {
     id: 2,
@@ -28,7 +28,7 @@ const FeaturedProduct = () => {
   const router = useRouter();
 
   const handleShopNow = () => {
-    router.push('/all-products');
+    router.push('/explore-collection');
   };
 
   return (

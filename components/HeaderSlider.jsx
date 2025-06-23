@@ -9,10 +9,10 @@ const HeaderSlider = () => {
     {
       id: 1,
       title: "Bringing Ideas to life, Layer by Layer",
-      offer: "Get the best custom prints with high-quality filament",
+      offer: "Professional 3D Solutions State-of-the-art 3D solutions for professional results",
       buttonText1: "Shop now",
       buttonText2: "Find more",
-      imgSrc: assets.banner,
+      imgSrc: assets.Printer,
     },
     {
       id: 2,
