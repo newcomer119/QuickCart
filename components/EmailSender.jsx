@@ -31,8 +31,8 @@ const EmailSender = ({ orderDetails }) => {
 
                 // Calculate shipping and tax (you can adjust these values)
                 const shipping = 50; // Default shipping cost
-                const tax = Math.round(orderDetails.totalAmount * 0.18); // 18% tax
-                const subtotal = orderDetails.totalAmount - shipping - tax;
+                const gst = Math.round(orderDetails.totalAmount * 0.18); // 18% GST
+                const subtotal = orderDetails.totalAmount - shipping - gst;
 
                 const templateParams = {
                     email: user.primaryEmailAddress.emailAddress,
@@ -43,7 +43,7 @@ const EmailSender = ({ orderDetails }) => {
                     orders: orders,
                     cost: {
                         shipping: shipping,
-                        tax: tax,
+                        gst: gst,
                         total: orderDetails.totalAmount
                     },
                     shipping_address: orderDetails.shippingAddress,
