@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema({
     image: { type: [String], required: true },
     category: { type: String, required: true },
     colors: { type: [String], required: true },
+    colorImages: { type: Object },
     date: { type: Number, required: true }
 }, { timestamps: true });
 

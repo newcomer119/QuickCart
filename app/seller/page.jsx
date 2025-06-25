@@ -13,7 +13,7 @@ const AddProduct = () => {
   const [description, setDescription] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [category, setCategory] = useState('Earphone');
-  const [selectedColors, setSelectedColors] = useState(['Pitch black']);
+  const [selectedColorImages, setSelectedColorImages] = useState({});
   const [price, setPrice] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
 
@@ -55,11 +55,17 @@ const AddProduct = () => {
   ];
 
   const handleColorChange = (color) => {
-    if (selectedColors.includes(color)) {
-      setSelectedColors(selectedColors.filter(c => c !== color));
-    } else {
-      setSelectedColors([...selectedColors, color]);
-    }
+    setSelectedColorImages(prev => {
+      if (prev[color]) {
+        // Deselect: remove color
+        const updated = { ...prev };
+        delete updated[color];
+        return updated;
+      } else {
+        // Select: add color with no image yet
+        return { ...prev, [color]: null };
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -72,8 +78,15 @@ const AddProduct = () => {
     }
 
     // Check if at least one color is selected
-    if (selectedColors.length === 0) {
+    if (Object.keys(selectedColorImages).length === 0) {
       toast.error("Please select at least one color");
+      return;
+    }
+
+    // Check if every selected color has an image
+    const missingImage = Object.entries(selectedColorImages).some(([color, file]) => !file);
+    if (missingImage) {
+      toast.error("Please upload an image for each selected color");
       return;
     }
 
@@ -82,7 +95,7 @@ const AddProduct = () => {
     formData.append('description', description);
     formData.append('additionalInfo', additionalInfo);
     formData.append('category', category);
-    formData.append('colors', JSON.stringify(selectedColors));
+    formData.append('colors', JSON.stringify(Object.keys(selectedColorImages)));
     formData.append('price', price);
     formData.append('offerPrice', offerPrice);
 
@@ -90,6 +103,13 @@ const AddProduct = () => {
     files.forEach((file, index) => {
       if (file) {
         formData.append('images', file);
+      }
+    });
+
+    // Append each color image
+    Object.entries(selectedColorImages).forEach(([color, file]) => {
+      if (file) {
+        formData.append(`colorImages[${color}]`, file);
       }
     });
 
@@ -116,7 +136,7 @@ const AddProduct = () => {
         setDescription('');
         setAdditionalInfo('');
         setCategory('Earphone');
-        setSelectedColors(['Pitch black']);
+        setSelectedColorImages({});
         setPrice('');
         setOfferPrice('');
       } else {
@@ -266,20 +286,44 @@ const AddProduct = () => {
           </label>
           <div className="flex flex-wrap gap-3 mt-2">
             {availableColors.map((color) => (
-              <label key={color} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedColors.includes(color)}
-                  onChange={() => handleColorChange(color)}
-                  className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-                />
-                <span className="text-sm">{color}</span>
-              </label>
+              <div key={color} className="flex flex-col items-start">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!selectedColorImages[color] || selectedColorImages[color] === null}
+                    onChange={() => handleColorChange(color)}
+                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                  />
+                  <span className="text-sm">{color}</span>
+                </label>
+                {selectedColorImages[color] !== undefined && (
+                  <div className="mt-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                        const file = e.target.files[0];
+                        setSelectedColorImages(prev => ({
+                          ...prev,
+                          [color]: file || null
+                        }));
+                      }}
+                    />
+                    {selectedColorImages[color] && (
+                      <img
+                        src={URL.createObjectURL(selectedColorImages[color])}
+                        alt={`${color} preview`}
+                        className="w-16 h-16 object-cover mt-1"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-          {selectedColors.length > 0 && (
+          {Object.keys(selectedColorImages).length > 0 && (
             <p className="text-xs text-gray-500 mt-1">
-              Selected: {selectedColors.join(', ')}
+              Selected: {Object.keys(selectedColorImages).join(', ')}
             </p>
           )}
         </div>

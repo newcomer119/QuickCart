@@ -104,6 +104,34 @@ export async function POST(request) {
         const images = result.map(result => result.secure_url);
         console.log("All files uploaded successfully"); // Debug log
 
+        // Handle color images
+        const colorImages = {};
+        for (const color of colors) {
+            const colorFile = formData.get(`colorImages[${color}]`);
+            if (colorFile) {
+                try {
+                    const arrayBuffer = await colorFile.arrayBuffer();
+                    const buffer = Buffer.from(arrayBuffer);
+                    const uploadResult = await new Promise((resolve, reject) => {
+                        const stream = cloudinary.uploader.upload_stream(
+                            { resource_type: 'auto' },
+                            (error, result) => {
+                                if (error) reject(error);
+                                else resolve(result);
+                            }
+                        );
+                        stream.end(buffer);
+                    });
+                    colorImages[color] = uploadResult.secure_url;
+                } catch (error) {
+                    console.error(`Error uploading color image for ${color}:`, error);
+                    colorImages[color] = null;
+                }
+            } else {
+                colorImages[color] = null;
+            }
+        }
+
         await connectDb();
         console.log("Database connected"); // Debug log
 
@@ -118,6 +146,7 @@ export async function POST(request) {
             additionalInfo,
             category,
             colors,
+            colorImages,
             price: Number(price),
             offerPrice: Number(offerPrice),
             image: images,

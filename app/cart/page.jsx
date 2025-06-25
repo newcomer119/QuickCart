@@ -49,6 +49,7 @@ const Cart = () => {
                   // Handle both old format (number) and new format (object)
                   const quantity = typeof cartItem === 'number' ? cartItem : cartItem?.quantity || 0;
                   const color = typeof cartItem === 'object' ? cartItem?.color : null;
+                  const colorImage = typeof cartItem === 'object' ? cartItem?.colorImage : null;
 
                   if (!product || quantity <= 0) return null;
 
@@ -75,7 +76,16 @@ const Cart = () => {
                         <div className="text-sm hidden md:block">
                           <p className="text-gray-800">{product.name}</p>
                           {color && (
-                            <p className="text-xs text-gray-600 mt-1">Color: {color}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-gray-600">Color: {color}</span>
+                              {colorImage && (
+                                <img
+                                  src={colorImage}
+                                  alt={color}
+                                  className="w-10 h-10 rounded-full border border-gray-400"
+                                />
+                              )}
+                            </div>
                           )}
                           <button
                             className="text-xs text-orange-600 mt-1"

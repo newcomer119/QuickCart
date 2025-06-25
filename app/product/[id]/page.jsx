@@ -21,6 +21,8 @@ const Product = () => {
   const [productData, setProductData] = useState(null);
   const [isProductLoading, setIsProductLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState('');
+  const [selectedColorImage, setSelectedColorImage] = useState(null);
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   const fetchProductData = async () => {
     setIsProductLoading(true);
@@ -28,10 +30,12 @@ const Product = () => {
     setProductData(product);
     if (product && product.colors) {
       if (Array.isArray(product.colors) && product.colors.length > 0) {
-        setSelectedColor(product.colors[0]); // Set first color as default
+        setSelectedColor(product.colors[0]);
+        setSelectedColorImage(product.colorImages ? product.colorImages[product.colors[0]] : null);
       } else if (typeof product.colors === 'string') {
         const firstColor = product.colors.split(/(?=[A-Z])/)[0];
         setSelectedColor(firstColor);
+        setSelectedColorImage(product.colorImages ? product.colorImages[firstColor] : null);
       }
     }
     setIsProductLoading(false);
@@ -57,25 +61,26 @@ const Product = () => {
     return () => clearTimeout(timeout);
   }, [setIsLoading]);
 
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
+    setSelectedColorImage(productData.colorImages ? productData.colorImages[color] : null);
+  };
+
   const handleAddToCart = () => {
     if (!user) {
       toast.error("Please login first to add items to cart");
       appRouter.push('/');
       return;
     }
-    
-    // Check if color selection is needed
     const hasMultipleColors = productData.colors && (
       (Array.isArray(productData.colors) && productData.colors.length > 1) ||
       (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
     );
-    
     if (hasMultipleColors && !selectedColor) {
       toast.error("Please select a color");
       return;
     }
-    
-    addToCart(productData._id, selectedColor);
+    addToCart(productData._id, selectedColor, selectedColorImage);
   };
 
   const handleBuyNow = () => {
@@ -84,21 +89,17 @@ const Product = () => {
       appRouter.push('/');
       return;
     }
-    
-    // Check if color selection is needed
     const hasMultipleColors = productData.colors && (
       (Array.isArray(productData.colors) && productData.colors.length > 1) ||
       (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
     );
-    
     if (hasMultipleColors && !selectedColor) {
       toast.error("Please select a color");
       return;
     }
-    
     const cartKey = selectedColor ? `${productData._id}_${selectedColor}` : productData._id;
     if (!cartItems[cartKey]) {
-      addToCart(productData._id, selectedColor);
+      addToCart(productData._id, selectedColor, selectedColorImage);
     }
     appRouter.push("/cart");
   };
@@ -220,41 +221,86 @@ const Product = () => {
                 <p className="text-base font-medium mb-3">Select Color:</p>
                 <div className="flex flex-wrap gap-2">
                   {Array.isArray(productData.colors) ? (
-                    // If colors is an array
                     productData.colors.map((color) => (
                       <button
                         key={color}
-                        onClick={() => setSelectedColor(color)}
+                        onClick={() => handleColorSelect(color)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                           selectedColor === color
                             ? 'bg-orange-500 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                        } flex items-center gap-2`}
                       >
+                        {productData.colorImages && productData.colorImages[color] && (
+                          <img
+                            src={productData.colorImages[color]}
+                            alt={color}
+                            className="w-6 h-6 rounded-full border border-gray-300"
+                          />
+                        )}
                         {color}
                       </button>
                     ))
                   ) : (
-                    // If colors is a string, split it
                     productData.colors.split(/(?=[A-Z])/).map((color) => (
                       <button
                         key={color}
-                        onClick={() => setSelectedColor(color)}
+                        onClick={() => handleColorSelect(color)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                           selectedColor === color
                             ? 'bg-orange-500 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                        } flex items-center gap-2`}
                       >
+                        {productData.colorImages && productData.colorImages[color] && (
+                          <img
+                            src={productData.colorImages[color]}
+                            alt={color}
+                            className="w-6 h-6 rounded-full border border-gray-300"
+                          />
+                        )}
                         {color}
                       </button>
                     ))
                   )}
                 </div>
                 {selectedColor && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Selected: <span className="font-medium">{selectedColor}</span>
-                  </p>
+                  <div className="flex flex-col items-start gap-2 mt-2">
+                    {selectedColorImage && (
+                      <>
+                        <img
+                          src={selectedColorImage}
+                          alt={selectedColor}
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-300 bg-gray-100 mb-2 cursor-zoom-in"
+                          onClick={() => setZoomedImage(selectedColorImage)}
+                        />
+                        {zoomedImage && (
+                          <div
+                            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+                            onClick={() => setZoomedImage(null)}
+                          >
+                            <div className="relative" onClick={e => e.stopPropagation()}>
+                              <img
+                                src={zoomedImage}
+                                alt="Zoomed"
+                                className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg border-2 border-white shadow-lg"
+                              />
+                              <button
+                                className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 text-gray-700 hover:bg-opacity-100"
+                                onClick={() => setZoomedImage(null)}
+                              >
+                                &#10005;
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-gray-600">Selected:</span>
+                      <span className="font-medium text-sm">{selectedColor}</span>
+                    </div>
+                  </div>
                 )}
               </div>
             ) : (

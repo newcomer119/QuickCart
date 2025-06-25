@@ -74,29 +74,26 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  const addToCart = async (itemId, selectedColor = null) => {
+  const addToCart = async (itemId, selectedColor = null, colorImage = null) => {
     if (!user) {
       toast.error("Please login first to add items to cart");
       router.push('/');
       return;
     }
-
     let cartData = structuredClone(cartItems);
     const cartKey = selectedColor ? `${itemId}_${selectedColor}` : itemId;
-    
     if (cartData[cartKey]) {
-      // If item already in cart, do not increment, just confirm
       toast.success("Item is already in your cart");
     } else {
       cartData[cartKey] = {
         quantity: 1,
-        color: selectedColor
+        color: selectedColor,
+        colorImage: colorImage
       };
       setCartItems(cartData);
       if (user) {
         try {
           const token = await getToken();
-
           await axios.post(
             "/api/cart/update",
             { cartData },
@@ -110,16 +107,16 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  const updateCartQuantity = async (itemId, quantity, selectedColor = null) => {
+  const updateCartQuantity = async (itemId, quantity, selectedColor = null, colorImage = null) => {
     let cartData = structuredClone(cartItems);
     const cartKey = selectedColor ? `${itemId}_${selectedColor}` : itemId;
-    
     if (quantity === 0) {
       delete cartData[cartKey];
     } else {
       cartData[cartKey] = {
         quantity: quantity,
-        color: selectedColor
+        color: selectedColor,
+        colorImage: colorImage
       };
     }
     setCartItems(cartData);
