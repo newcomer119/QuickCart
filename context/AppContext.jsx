@@ -25,16 +25,18 @@ export const AppContextProvider = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchProductData = async () => {
+    setIsLoading(true);
     try {
       const { data } = await axios.get("/api/product/list");
       if (data.success) {
         setProducts(data.products);
       } else {
-        toast.error(error.message);
+        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(message);
+      toast.error(error.message);
     }
+    setIsLoading(false);
     // setProducts(productsDummyData);
   };
 
