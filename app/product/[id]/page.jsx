@@ -62,8 +62,13 @@ const Product = () => {
   }, [setIsLoading]);
 
   const handleColorSelect = (color) => {
-    setSelectedColor(color);
-    setSelectedColorImage(productData.colorImages ? productData.colorImages[color] : null);
+    if (selectedColor === color) {
+      setSelectedColor('');
+      setSelectedColorImage(null);
+    } else {
+      setSelectedColor(color);
+      setSelectedColorImage(productData.colorImages ? productData.colorImages[color] : null);
+    }
   };
 
   const handleAddToCart = () => {
@@ -222,79 +227,73 @@ const Product = () => {
                 <div className="flex flex-wrap gap-2">
                   {Array.isArray(productData.colors) ? (
                     productData.colors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => handleColorSelect(color)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                          selectedColor === color
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        } flex items-center gap-2`}
-                      >
-                        {productData.colorImages && productData.colorImages[color] && (
-                          <img
-                            src={productData.colorImages[color]}
-                            alt={color}
-                            className="w-6 h-6 rounded-full border border-gray-300"
-                          />
-                        )}
-                        {color}
-                      </button>
+                      <div key={color} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedColor === color}
+                          onChange={() => handleColorSelect(color)}
+                          className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleColorSelect(color)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                            selectedColor === color
+                              ? 'bg-orange-500 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          } flex items-center gap-2`}
+                        >
+                          {productData.colorImages && productData.colorImages[color] && (
+                            <img
+                              src={productData.colorImages[color]}
+                              alt={color}
+                              className="w-6 h-6 rounded-full border border-gray-300"
+                            />
+                          )}
+                          {color}
+                        </button>
+                      </div>
                     ))
                   ) : (
                     productData.colors.split(/(?=[A-Z])/).map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => handleColorSelect(color)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                          selectedColor === color
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        } flex items-center gap-2`}
-                      >
-                        {productData.colorImages && productData.colorImages[color] && (
-                          <img
-                            src={productData.colorImages[color]}
-                            alt={color}
-                            className="w-6 h-6 rounded-full border border-gray-300"
-                          />
-                        )}
-                        {color}
-                      </button>
+                      <div key={color} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedColor === color}
+                          onChange={() => handleColorSelect(color)}
+                          className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleColorSelect(color)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                            selectedColor === color
+                              ? 'bg-orange-500 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          } flex items-center gap-2`}
+                        >
+                          {productData.colorImages && productData.colorImages[color] && (
+                            <img
+                              src={productData.colorImages[color]}
+                              alt={color}
+                              className="w-6 h-6 rounded-full border border-gray-300"
+                            />
+                          )}
+                          {color}
+                        </button>
+                      </div>
                     ))
                   )}
                 </div>
                 {selectedColor && (
                   <div className="flex flex-col items-start gap-2 mt-2">
                     {selectedColorImage && (
-                      <>
-                        <img
-                          src={selectedColorImage}
-                          alt={selectedColor}
-                          className="w-32 h-32 object-cover rounded-lg border border-gray-300 bg-gray-100 mb-2 cursor-zoom-in"
-                          onClick={() => setZoomedImage(selectedColorImage)}
-                        />
-                        {zoomedImage && (
-                          <div
-                            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
-                            onClick={() => setZoomedImage(null)}
-                          >
-                            <div className="relative" onClick={e => e.stopPropagation()}>
-                              <img
-                                src={zoomedImage}
-                                alt="Zoomed"
-                                className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg border-2 border-white shadow-lg"
-                              />
-                              <button
-                                className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 text-gray-700 hover:bg-opacity-100"
-                                onClick={() => setZoomedImage(null)}
-                              >
-                                &#10005;
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </>
+                      <img
+                        src={selectedColorImage}
+                        alt={selectedColor}
+                        className="w-32 h-32 object-cover rounded-lg border border-gray-300 bg-gray-100 mb-2 cursor-zoom-in"
+                        onClick={() => setZoomedImage(selectedColorImage)}
+                      />
                     )}
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-gray-600">Selected:</span>

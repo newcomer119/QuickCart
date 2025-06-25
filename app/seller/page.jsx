@@ -56,7 +56,7 @@ const AddProduct = () => {
 
   const handleColorChange = (color) => {
     setSelectedColorImages(prev => {
-      if (prev[color]) {
+      if (prev[color] !== undefined) {
         // Deselect: remove color
         const updated = { ...prev };
         delete updated[color];
@@ -290,7 +290,7 @@ const AddProduct = () => {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={!!selectedColorImages[color] || selectedColorImages[color] === null}
+                    checked={selectedColorImages[color] !== undefined}
                     onChange={() => handleColorChange(color)}
                     className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
                   />
