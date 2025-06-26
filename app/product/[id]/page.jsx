@@ -135,6 +135,27 @@ const Product = () => {
   return (
     <>
       <Navbar />
+      {/* Zoom Modal for color image */}
+      {zoomedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+          onClick={() => setZoomedImage(null)}
+        >
+          <div className="relative" onClick={e => e.stopPropagation()}>
+            <img
+              src={zoomedImage}
+              alt="Zoomed"
+              className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg border-2 border-white shadow-lg"
+            />
+            <button
+              className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 text-gray-700 hover:bg-opacity-100"
+              onClick={() => setZoomedImage(null)}
+            >
+              &#10005;
+            </button>
+          </div>
+        </div>
+      )}
       <div className="px-6 md:px-16 lg:px-32 pt-14 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           <div className="px-5 lg:px-16 xl:px-20">
@@ -294,9 +315,7 @@ const Product = () => {
                 <p className="text-gray-600">No different colors</p>
               </div>
             )}
-
             {/* Debug info - remove this later */}
-           
             <div className="overflow-x-auto">
               <table className="table-auto border-collapse w-full max-w-72">
                 <tbody>
@@ -329,7 +348,6 @@ const Product = () => {
                 </tbody>
               </table>
             </div>
-
             <div className="flex items-center mt-10 gap-4">
               <button
                 onClick={handleAddToCart}
