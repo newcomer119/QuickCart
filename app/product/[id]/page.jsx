@@ -321,7 +321,7 @@ const Product = () => {
                 <tbody>
                   <tr>
                     <td className="text-gray-600 font-medium">Brand</td>
-                    <td className="text-gray-800/50 ">Generic</td>
+                    <td className="text-gray-800/50 ">Filament Freaks</td>
                   </tr>
                   <tr>
                     <td className="text-gray-600 font-medium">Color</td>
