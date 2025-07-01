@@ -19,10 +19,9 @@ export async function POST(request) {
 
         // calculate amount using items
         const amount = await items.reduce(async (acc, item) => {
-            const productId = item.product.split('_')[0];
-            const product = await Product.findById(productId);
+            const product = await Product.findById(item.product);
             if (!product) {
-                throw new Error(`Product not found for id: ${productId}`);
+                throw new Error(`Product not found for id: ${item.product}`);
             }
             return await acc + product.offerPrice * item.quantity
         }, 0)
@@ -77,15 +76,15 @@ export async function POST(request) {
 
         // Get product details for email
         const itemsWithDetails = await Promise.all(items.map(async (item) => {
-            const productId = item.product.split('_')[0];
-            const product = await Product.findById(productId);
+            const product = await Product.findById(item.product);
             if (!product) {
-                throw new Error(`Product not found for id: ${productId}`);
+                throw new Error(`Product not found for id: ${item.product}`);
             }
             return {
                 name: product.name,
                 quantity: item.quantity,
-                price: product.offerPrice
+                price: product.offerPrice,
+                color: item.color || null
             };
         }));
 

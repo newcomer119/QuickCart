@@ -159,18 +159,13 @@ const OrderSummary = () => {
       // Convert cart items to order format, handling both old and new cart structures
       let cartItemsArray = Object.keys(cartItems).map((cartKey) => {
         const cartItem = cartItems[cartKey];
-        
-        // Handle both old format (number) and new format (object)
-        if (typeof cartItem === 'number') {
-          return { product: cartKey, quantity: cartItem };
-        } else {
-          // New format: {quantity: number, color: string}
-          return { 
-            product: cartKey, 
-            quantity: cartItem.quantity,
-            color: cartItem.color 
-          };
-        }
+        const [productId, ...colorParts] = cartKey.split('_');
+        const color = colorParts.length > 0 ? colorParts.join('_') : null;
+        return {
+          product: productId,
+          quantity: cartItem.quantity,
+          color: color
+        };
       });
       
       cartItemsArray = cartItemsArray.filter(item => item.quantity > 0)
