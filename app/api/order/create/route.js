@@ -7,9 +7,15 @@ import connectDb from "@/config/db";
 import Order from "@/models/Order";
 import { sendOrderConfirmationEmail } from "@/lib/emailjs";
 import Address from "@/models/Address";
+import mongoose from "mongoose";
+
+function isValidObjectId(id) {
+    return mongoose.Types.ObjectId.isValid(id);
+}
 
 export async function POST(request) {
     try {
+        await connectDb();
         const { userId } = getAuth(request)
         const { address, items, paymentMethod } = await request.json()
 
@@ -24,6 +30,9 @@ export async function POST(request) {
             if (typeof productId === 'string' && productId.includes('_')) {
                 productId = productId.split('_')[0];
             }
+            if (!isValidObjectId(productId)) {
+                throw new Error(`Invalid product id: ${productId}`);
+            }
             const product = await Product.findById(productId);
             if (!product) {
                 throw new Error(`Product not found for id: ${productId}`);
@@ -33,8 +42,6 @@ export async function POST(request) {
 
         const totalAmount = amount + Math.floor(amount * 0.02);
 
-        await connectDb();
-        
         // Get user details for email
         const user = await User.findById(userId);
         if (!user) {
@@ -85,6 +92,9 @@ export async function POST(request) {
             let productId = item.product;
             if (typeof productId === 'string' && productId.includes('_')) {
                 productId = productId.split('_')[0];
+            }
+            if (!isValidObjectId(productId)) {
+                throw new Error(`Invalid product id: ${productId}`);
             }
             const product = await Product.findById(productId);
             if (!product) {
