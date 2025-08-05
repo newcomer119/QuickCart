@@ -22,6 +22,9 @@ const OrderSummary = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [userAddresses, setUserAddresses] = useState([]);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [isCouponValid, setIsCouponValid] = useState(false);
 
   const fetchUserAddresses = async () => {
     // setUserAddresses(addressDummyData);
@@ -63,6 +66,41 @@ const OrderSummary = () => {
     });
   };
 
+  const handleApplyCoupon = () => {
+    const code = couponCode.trim().toUpperCase();
+    
+    if (code === 'FIRST25') {
+      setAppliedCoupon({
+        code: code,
+        discount: 25,
+        type: 'percentage'
+      });
+      setIsCouponValid(true);
+      toast.success('Coupon applied successfully! 25% off');
+    } else {
+      setAppliedCoupon(null);
+      setIsCouponValid(false);
+      toast.error('Invalid coupon code');
+    }
+  };
+
+  const calculateDiscount = () => {
+    if (!appliedCoupon) return 0;
+    
+    const subtotal = getCartAmount();
+    if (appliedCoupon.type === 'percentage') {
+      return Math.floor(subtotal * (appliedCoupon.discount / 100));
+    }
+    return 0;
+  };
+
+  const getFinalAmount = () => {
+    const subtotal = getCartAmount();
+    const gst = Math.floor(subtotal * 0.18);
+    const discount = calculateDiscount();
+    return subtotal + gst - discount;
+  };
+
   const handlePayment = async (orderData) => {
     try {
       const res = await initializeRazorpay();
@@ -71,7 +109,7 @@ const OrderSummary = () => {
         return;
       }
 
-      const totalAmount = getCartAmount() + Math.floor(getCartAmount() * 0.02);
+      const totalAmount = getFinalAmount();
       console.log('Creating payment for amount:', totalAmount);
 
       const { data } = await axios.post('/api/payment/create', {
@@ -178,7 +216,9 @@ const OrderSummary = () => {
       const { data } = await axios.post('/api/order/create', {
         address: selectedAddress._id,
         items: cartItemsArray,
-        paymentMethod
+        paymentMethod,
+        couponCode: appliedCoupon?.code || null,
+        discount: calculateDiscount()
       }, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -312,12 +352,24 @@ const OrderSummary = () => {
             <input
               type="text"
               placeholder="Enter promo code"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
               className="flex-grow w-full outline-none p-2.5 text-gray-600 border"
             />
-            <button className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700">
+            <button 
+              onClick={handleApplyCoupon}
+              className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700"
+            >
               Apply
             </button>
           </div>
+          {appliedCoupon && (
+            <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+              <p className="text-green-800 text-sm">
+                Coupon "{appliedCoupon.code}" applied! {appliedCoupon.discount}% off
+              </p>
+            </div>
+          )}
         </div>
 
         <hr className="border-gray-500/30 my-5" />
@@ -341,11 +393,20 @@ const OrderSummary = () => {
               {Math.floor(getCartAmount() * 0.18)}
             </p>
           </div>
+          {appliedCoupon && (
+            <div className="flex justify-between text-green-600">
+              <p>Discount ({appliedCoupon.discount}%)</p>
+              <p className="font-medium">
+                -{currency}
+                {calculateDiscount()}
+              </p>
+            </div>
+          )}
           <div className="flex justify-between text-lg md:text-xl font-medium border-t pt-3">
             <p>Total</p>
             <p>
               {currency}
-              {getCartAmount() + Math.floor(getCartAmount() * 0.18)}
+              {getFinalAmount()}
             </p>
           </div>
         </div>
