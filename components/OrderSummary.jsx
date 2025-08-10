@@ -27,7 +27,6 @@ const OrderSummary = () => {
   const [isCouponValid, setIsCouponValid] = useState(false);
 
   const fetchUserAddresses = async () => {
-    // setUserAddresses(addressDummyData);
     try {
       const token = await getToken();
       const { data } = await axios.get("/api/user/get-address", {
@@ -42,7 +41,6 @@ const OrderSummary = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.error("Error fetching addresses:", error);
       toast.error(error.message);
     }
   };
@@ -101,7 +99,56 @@ const OrderSummary = () => {
     return subtotal + gst - discount;
   };
 
-  const handlePayment = async (orderData) => {
+  const createOrderAfterPayment = async (paymentData) => {
+    try {
+      const token = await getToken();
+      
+      // Convert cart items to order format
+      let cartItemsArray = Object.keys(cartItems).map((cartKey) => {
+        const cartItem = cartItems[cartKey];
+        const [productId, ...colorParts] = cartKey.split('_');
+        const color = colorParts.length > 0 ? colorParts.join('_') : null;
+        return {
+          product: productId,
+          quantity: cartItem.quantity,
+          color: color
+        };
+      });
+      
+      cartItemsArray = cartItemsArray.filter(item => item.quantity > 0);
+
+      const { data } = await axios.post('/api/order/create', {
+        address: selectedAddress._id,
+        items: cartItemsArray,
+        paymentMethod: 'ONLINE',
+        couponCode: appliedCoupon?.code || null,
+        discount: calculateDiscount(),
+        paymentId: paymentData.razorpay_payment_id,
+        orderId: paymentData.razorpay_order_id,
+        signature: paymentData.razorpay_signature
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+        setCartItems({});
+        
+        // Store order details for email
+        if (data.orderDetails) {
+          localStorage.setItem('lastOrder', JSON.stringify(data.orderDetails));
+        }
+        
+        router.push('/order-placed');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handlePayment = async () => {
     try {
       const res = await initializeRazorpay();
       if (!res) {
@@ -110,7 +157,6 @@ const OrderSummary = () => {
       }
 
       const totalAmount = getFinalAmount();
-      console.log('Creating payment for amount:', totalAmount);
 
       const { data } = await axios.post('/api/payment/create', {
         amount: totalAmount
@@ -133,23 +179,19 @@ const OrderSummary = () => {
             const { data: verifyData } = await axios.post('/api/payment/verify', {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              orderId: orderData._id
+              razorpay_signature: response.razorpay_signature
             });
 
             if (verifyData.success) {
               toast.success("Payment successful!");
-              setCartItems({});
-              router.push('/order-placed');
+              // Create order after successful payment
+              await createOrderAfterPayment(response);
             } else {
               toast.error("Payment verification failed");
-              // Refresh the page to show the correct order status
               router.refresh();
             }
           } catch (error) {
-            console.error("Payment verification error:", error);
             toast.error("Payment verification failed");
-            // Refresh the page to show the correct order status
             router.refresh();
           }
         },
@@ -162,28 +204,15 @@ const OrderSummary = () => {
           color: "#F97316"
         },
         modal: {
-          ondismiss: async function() {
+          ondismiss: function() {
             toast.error("Payment cancelled");
-            try {
-              // Delete the pending order when payment is cancelled
-              const token = await getToken();
-              await axios.delete(`/api/order/${orderData._id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-              });
-              // Refresh the page to show the correct order status
-              router.refresh();
-            } catch (error) {
-              console.error("Error deleting pending order:", error);
-            }
           }
         }
       };
 
-      console.log('Opening Razorpay with options:', options);
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     } catch (error) {
-      console.error("Payment error:", error);
       toast.error(error.message);
     }
   };
@@ -194,7 +223,7 @@ const OrderSummary = () => {
         return toast.error('Please select an address')
       }
 
-      // Convert cart items to order format, handling both old and new cart structures
+      // Convert cart items to order format
       let cartItemsArray = Object.keys(cartItems).map((cartKey) => {
         const cartItem = cartItems[cartKey];
         const [productId, ...colorParts] = cartKey.split('_');
@@ -212,6 +241,13 @@ const OrderSummary = () => {
         return toast.error("cart is empty")
       }
 
+      if (paymentMethod === 'ONLINE') {
+        // For online payment, directly open Razorpay without creating order
+        await handlePayment();
+        return;
+      }
+
+      // For COD, create order immediately
       const token = await getToken()
       const { data } = await axios.post('/api/order/create', {
         address: selectedAddress._id,
@@ -226,17 +262,13 @@ const OrderSummary = () => {
       if (data.success) {
         toast.success(data.message)
         setCartItems({})
+        
         // Store order details for email
         if (data.orderDetails) {
-          console.log('Storing order details:', data.orderDetails);
           localStorage.setItem('lastOrder', JSON.stringify(data.orderDetails));
         }
-        if (paymentMethod === 'ONLINE') {
-          // Call Razorpay payment handler with the order data
-          await handlePayment(data.orderDetails || data.order);
-        } else {
-          router.push('/order-placed')
-        }
+        
+        router.push('/order-placed')
       } else {
         toast.error(data.message)
       }

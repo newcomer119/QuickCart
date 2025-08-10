@@ -18,19 +18,15 @@ export async function POST(request) {
             receipt: "receipt_" + Date.now(),
         };
 
-        // Log the API key (first few characters for security)
+        // Check if API keys are configured
         const keyId = process.env.RAZORPAY_KEY_ID;
         const keySecret = process.env.RAZORPAY_KEY_SECRET;
-        
-        console.log('Using Razorpay Key ID:', keyId?.substring(0, 8) + '...');
-        console.log('Key Secret length:', keySecret?.length);
         
         if (!keyId || !keySecret) {
             throw new Error('Razorpay API keys are not properly configured');
         }
 
         const authString = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
-        console.log('Auth string length:', authString.length);
 
         // Create order using Razorpay REST API
         const response = await fetch('https://api.razorpay.com/v1/orders', {
@@ -43,8 +39,6 @@ export async function POST(request) {
         });
 
         const order = await response.json();
-        console.log('Razorpay API response status:', response.status);
-        console.log('Razorpay API response:', order);
 
         if (!response.ok) {
             throw new Error(`Razorpay API error: ${order.error?.description || 'Unknown error'}`);

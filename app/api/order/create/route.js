@@ -17,7 +17,7 @@ export async function POST(request) {
     try {
         await connectDb();
         const { userId } = getAuth(request)
-        const { address, items, paymentMethod } = await request.json()
+        const { address, items, paymentMethod, paymentId, orderId, signature, couponCode, discount } = await request.json()
 
         if (!address || items.length === 0) {
             return NextResponse.json({ success: false, message: 'Invalid Data' })
@@ -40,7 +40,12 @@ export async function POST(request) {
             return await acc + product.offerPrice * item.quantity
         }, 0)
 
-        const totalAmount = amount + Math.floor(amount * 0.02);
+        let totalAmount = amount + Math.floor(amount * 0.18); // GST calculation
+        
+        // Apply discount if coupon is used
+        if (couponCode && discount) {
+            totalAmount = totalAmount - discount;
+        }
 
         // Get user details for email
         const user = await User.findById(userId);
@@ -48,41 +53,35 @@ export async function POST(request) {
             return NextResponse.json({ success: false, message: 'User not found' });
         }
 
-        // For online payment, create a pending order
-        if (paymentMethod === 'ONLINE') {
-            const order = await Order.create({
-                userId,
-                address,
-                items,
-                amount: totalAmount,
-                paymentMethod,
-                paymentStatus: 'PENDING',
-                status: 'PENDING',
-                date: Date.now(),
-                data: { items, address, paymentMethod }
-            });
-
-            return NextResponse.json({ 
-                success: true, 
-                message: "Order created pending payment",
-                order
-            })
-        }
-        
-        // For COD, create a completed order
-        const order = await Order.create({
+        // Create order with appropriate status based on payment method
+        let orderData = {
             userId,
             address,
             items,
             amount: totalAmount,
             paymentMethod,
-            paymentStatus: 'COMPLETED',
-            status: 'Order Placed',
             date: Date.now(),
-            data: { items, address, paymentMethod }
-        });
+            data: { items, address, paymentMethod, couponCode, discount }
+        };
 
-        // clear user cart only for COD orders
+        if (paymentMethod === 'ONLINE') {
+            // For online payment, create completed order with payment details
+            orderData.paymentStatus = 'COMPLETED';
+            orderData.status = 'Order Placed';
+            orderData.paymentDetails = {
+                paymentId,
+                orderId,
+                signature
+            };
+        } else {
+            // For COD, create completed order
+            orderData.paymentStatus = 'COMPLETED';
+            orderData.status = 'Order Placed';
+        }
+
+        const order = await Order.create(orderData);
+
+        // clear user cart for all completed orders
         user.cartItems = {}
         await user.save()
 
@@ -121,25 +120,19 @@ export async function POST(request) {
             totalAmount,
             items: itemsWithDetails,
             shippingAddress: formattedAddress,
-            paymentMethod
+            paymentMethod,
+            discount: discount || 0
         };
 
         // Send order confirmation email
         try {
-            console.log('Preparing to send order confirmation email...');
-            console.log('User email:', user.email);
-            console.log('Order details:', orderDetails);
-
             const emailResult = await sendOrderConfirmationEmail(orderDetails);
-
-            console.log('Email sending result:', emailResult);
 
             if (!emailResult.success) {
                 console.error('Failed to send email:', emailResult.error);
             }
         } catch (emailError) {
             console.error('Error in email sending:', emailError);
-            console.error('Error stack:', emailError.stack);
         }
 
         await inngest.send({
@@ -156,7 +149,7 @@ export async function POST(request) {
 
         return NextResponse.json({ 
             success: true, 
-            message: "Order Placed",
+            message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
             order,
             orderDetails
         })
