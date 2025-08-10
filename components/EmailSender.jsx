@@ -9,12 +9,7 @@ const EmailSender = ({ orderDetails }) => {
     useEffect(() => {
         const sendEmail = async () => {
             try {
-                console.log('Starting email send process...');
-                console.log('Full order details:', JSON.stringify(orderDetails, null, 2));
-                console.log('User email:', user?.primaryEmailAddress?.emailAddress);
-
                 if (!orderDetails || !user?.primaryEmailAddress?.emailAddress) {
-                    console.error('No order details or user email found');
                     return;
                 }
 
@@ -26,12 +21,12 @@ const EmailSender = ({ orderDetails }) => {
                     name: item.name,
                     units: item.quantity,
                     price: item.price,
-                    image_url: item.image || 'https://via.placeholder.com/64x64?text=Product' // fallback image
+                    image_url: item.image || 'https://via.placeholder.com/64x64?text=Product'
                 }));
 
-                // Calculate shipping and tax (you can adjust these values)
-                const shipping = 50; // Default shipping cost
-                const gst = Math.round(orderDetails.totalAmount * 0.18); // 18% GST
+                // Calculate shipping and tax
+                const shipping = 50;
+                const gst = Math.round(orderDetails.totalAmount * 0.18);
                 const subtotal = orderDetails.totalAmount - shipping - gst;
 
                 const templateParams = {
@@ -50,10 +45,6 @@ const EmailSender = ({ orderDetails }) => {
                     payment_method: orderDetails.paymentMethod
                 };
 
-                console.log('Sending email with template params:', JSON.stringify(templateParams, null, 2));
-                console.log('Template variables:', Object.keys(templateParams));
-                console.log('Recipient email:', templateParams.email);
-
                 // Try the send method first
                 try {
                     const response = await emailjs.send(
@@ -61,13 +52,8 @@ const EmailSender = ({ orderDetails }) => {
                         'template_9dd766b',
                         templateParams
                     );
-                    console.log('Email sent successfully:', response);
-                    console.log('Response status:', response.status);
-                    console.log('Response text:', response.text);
                 } catch (sendError) {
-                    console.log('Send method failed, trying sendForm method...');
-                    
-                    // Create a temporary form element
+                    // Create a temporary form element as fallback
                     const form = document.createElement('form');
                     form.style.display = 'none';
                     
@@ -91,29 +77,19 @@ const EmailSender = ({ orderDetails }) => {
                     );
                     
                     document.body.removeChild(form);
-                    
-                    console.log('Email sent successfully via sendForm:', formResponse);
-                    console.log('Response status:', formResponse.status);
-                    console.log('Response text:', formResponse.text);
                 }
             } catch (error) {
-                console.error('Error sending email:', error);
-                console.error('Error details:', {
-                    message: error.message,
-                    text: error.text,
-                    stack: error.stack
-                });
+                // Silently handle errors in production
+                // You could optionally add error tracking here (like Sentry)
             }
         };
 
         if (orderDetails && user) {
             sendEmail();
-        } else {
-            console.log('Waiting for order details and user data...');
         }
     }, [orderDetails, user]);
 
-    return null; // This component doesn't render anything
+    return null;
 };
 
-export default EmailSender; 
+export default EmailSender;
