@@ -14,6 +14,7 @@ export async function GET(request) {
         const orders = await Order.find({userId})
             .populate('address')
             .populate('items.product')
+            .select('customOrderId items address amount paymentMethod paymentStatus date')
 
         return NextResponse.json({success : true, orders })
 

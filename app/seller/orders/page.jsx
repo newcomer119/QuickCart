@@ -60,16 +60,21 @@ const Orders = () => {
                       src={assets.box_icon}
                       alt="box_icon"
                     />
-                    <p className="flex flex-col gap-3">
-                      <span className="font-medium">
-                        {order.items
-                          .map(
-                            (item) => (item.product?.name || 'Product Name Unavailable') + ` x ${item.quantity}`
-                          )
-                          .join(", ")}
-                      </span>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-lg font-bold text-orange-600">
+                          Order #{order.customOrderId || 'N/A'}
+                        </span>
+                        <span className="font-medium">
+                          {order.items
+                            .map(
+                              (item) => (item.product?.name || 'Product Name Unavailable') + ` x ${item.quantity}`
+                            )
+                            .join(", ")}
+                        </span>
+                      </div>
                       <span>Items : {order.items.length}</span>
-                    </p>
+                    </div>
                   </div>
                   <div>
                     <p>

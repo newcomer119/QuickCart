@@ -2,12 +2,13 @@ import { inngest } from "@/config/inngest";
 import Product from "@/models/Product";
 import User from "@/models/Users";
 import { getAuth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import NextResponse from "next/server";
 import connectDb from "@/config/db";
 import Order from "@/models/Order";
 import { sendOrderConfirmationEmail } from "@/lib/emailjs";
 import Address from "@/models/Address";
 import mongoose from "mongoose";
+import { generateCustomOrderId } from "@/lib/orderIdGenerator";
 
 function isValidObjectId(id) {
     return mongoose.Types.ObjectId.isValid(id);
@@ -57,8 +58,26 @@ export async function POST(request) {
             return NextResponse.json({ success: false, message: 'User not found' });
         }
 
+        // Generate custom order ID
+        let customOrderId;
+        try {
+            customOrderId = await generateCustomOrderId();
+            
+            // Verify the generated ID is unique
+            const existingOrder = await Order.findOne({ customOrderId });
+            if (existingOrder) {
+                // If duplicate, generate a new one with timestamp
+                customOrderId = `ORDER-${Date.now()}`;
+            }
+        } catch (error) {
+            console.error('Error generating custom order ID:', error);
+            // Fallback to timestamp-based ID if generation fails
+            customOrderId = `ORDER-${Date.now()}`;
+        }
+
         // Create order with appropriate status based on payment method
         let orderData = {
+            customOrderId,
             userId,
             address,
             items,
@@ -124,7 +143,7 @@ export async function POST(request) {
         // Prepare order details for email
         const orderDetails = {
             email: user.email,
-            orderNumber: order._id,
+            orderNumber: customOrderId, // Use custom order ID instead of MongoDB _id
             totalAmount,
             subtotal: subtotal,
             gst: gst,
@@ -149,6 +168,7 @@ export async function POST(request) {
         await inngest.send({
             name: "order/created",
             data: {
+                customOrderId,
                 userId,
                 address,
                 items,

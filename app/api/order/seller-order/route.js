@@ -18,7 +18,7 @@ export async function GET(request) {
         await connectDb();
         
         const orders = await Order.find({}).populate('address items.product')
-            .select('items address amount subtotal gst deliveryCharges discount paymentMethod paymentStatus status date');
+            .select('customOrderId items address amount subtotal gst deliveryCharges discount paymentMethod paymentStatus status date');
         
         // Handle backward compatibility for existing orders
         const ordersWithDefaults = orders.map(order => ({
