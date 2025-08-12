@@ -24,7 +24,7 @@ export async function POST(request) {
         }
 
         // calculate amount using items
-        const amount = await items.reduce(async (acc, item) => {
+        const subtotal = await items.reduce(async (acc, item) => {
             // Extract productId if item.product contains an underscore
             let productId = item.product;
             if (typeof productId === 'string' && productId.includes('_')) {
@@ -40,12 +40,16 @@ export async function POST(request) {
             return await acc + product.offerPrice * item.quantity
         }, 0)
 
-        let totalAmount = amount + Math.floor(amount * 0.18); // GST calculation
+        // Calculate payment breakdown
+        const gst = Math.floor(subtotal * 0.18); // 18% GST
+        const deliveryCharges = 0; // Free delivery for now
+        const discountAmount = discount || 0;
+        const totalAmount = subtotal + gst + deliveryCharges - discountAmount;
         
-        // Apply discount if coupon is used
-        if (couponCode && discount) {
-            totalAmount = totalAmount - discount;
-        }
+        // Remove the duplicate discount application since it's already included above
+        // if (couponCode && discount) {
+        //     totalAmount = totalAmount - discount;
+        // }
 
         // Get user details for email
         const user = await User.findById(userId);
@@ -59,6 +63,10 @@ export async function POST(request) {
             address,
             items,
             amount: totalAmount,
+            subtotal: subtotal,
+            gst: gst,
+            deliveryCharges: deliveryCharges,
+            discount: discountAmount,
             paymentMethod,
             date: Date.now(),
             data: { items, address, paymentMethod, couponCode, discount }
@@ -118,10 +126,13 @@ export async function POST(request) {
             email: user.email,
             orderNumber: order._id,
             totalAmount,
+            subtotal: subtotal,
+            gst: gst,
+            deliveryCharges: deliveryCharges,
+            discount: discountAmount,
             items: itemsWithDetails,
             shippingAddress: formattedAddress,
-            paymentMethod,
-            discount: discount || 0
+            paymentMethod
         };
 
         // Send order confirmation email
@@ -142,6 +153,10 @@ export async function POST(request) {
                 address,
                 items,
                 amount: totalAmount,
+                subtotal: subtotal,
+                gst: gst,
+                deliveryCharges: deliveryCharges,
+                discount: discountAmount,
                 paymentMethod,
                 date: Date.now()
             }

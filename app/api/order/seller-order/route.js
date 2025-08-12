@@ -18,7 +18,18 @@ export async function GET(request) {
         await connectDb();
         
         const orders = await Order.find({}).populate('address items.product')
-        return NextResponse.json({ success : true, orders})
+            .select('items address amount subtotal gst deliveryCharges discount paymentMethod paymentStatus status date');
+        
+        // Handle backward compatibility for existing orders
+        const ordersWithDefaults = orders.map(order => ({
+            ...order.toObject(),
+            subtotal: order.subtotal || (order.amount ? Math.round(order.amount / 1.18) : 0),
+            gst: order.gst || (order.amount ? Math.round(order.amount - (order.amount / 1.18)) : 0),
+            deliveryCharges: order.deliveryCharges || 0,
+            discount: order.discount || 0
+        }));
+        
+        return NextResponse.json({ success : true, orders: ordersWithDefaults})
 
     } catch (error) {
         return NextResponse.json({ success : false, message : error.message})

@@ -84,17 +84,40 @@ const Orders = () => {
                       <span>{order.address?.phoneNumber || 'Phone Unavailable'}</span>
                     </p>
                   </div>
-                  <p className="font-medium my-auto">
-                    {currency}
-                    {order.amount}
-                  </p>
+                  <div className="text-right">
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between gap-4">
+                        <span>Subtotal:</span>
+                        <span>{currency}{order.subtotal || 0}</span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span>GST (18%):</span>
+                        <span>{currency}{order.gst || 0}</span>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <span>Delivery:</span>
+                        <span>{currency}{order.deliveryCharges || 0}</span>
+                      </div>
+                      {order.discount > 0 && (
+                        <div className="flex justify-between gap-4 text-green-600">
+                          <span>Discount:</span>
+                          <span>-{currency}{order.discount}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between gap-4 font-medium border-t pt-1">
+                        <span>Total:</span>
+                        <span>{currency}{order.amount}</span>
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     <p className="flex flex-col">
-                      <span>Method : COD</span>
+                      <span>Method : {order.paymentMethod}</span>
                       <span>
                         Date : {new Date(order.date).toLocaleDateString()}
                       </span>
-                      <span>Payment : Pending</span>
+                      <span>Payment : {order.paymentStatus}</span>
+                      <span>Status : {order.status}</span>
                     </p>
                   </div>
                 </div>

@@ -8,7 +8,11 @@ const orderSchema = new mongoose.Schema({
         quantity : {type : Number, required : true},
         color: {type: String}
     }],
-    amount : {type : Number, required : true},
+    amount : {type : Number, required : true}, // Final total amount
+    subtotal : {type : Number, required : true}, // Subtotal before taxes and charges
+    gst : {type : Number, required : true, default: 0}, // GST amount
+    deliveryCharges : {type : Number, required : true, default: 0}, // Delivery charges
+    discount : {type : Number, required : true, default: 0}, // Discount amount
     address : {type : String, ref : 'address', required : true},
     status : {type : String, required : true, default : "Order Placed"},
     paymentMethod : {type : String, required : true, enum : ['COD', 'ONLINE']},
