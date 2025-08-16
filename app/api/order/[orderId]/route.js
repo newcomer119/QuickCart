@@ -3,6 +3,7 @@ import connectDb from '@/config/db';
 import Order from '@/models/Order';
 import { getAuth } from '@clerk/nextjs/server';
 import authSeller from "@/lib/authSeller";
+import User from "@/models/Users"; // Import User model to ensure it's registered
 
 export async function DELETE(request, { params }) {
     try {
@@ -66,7 +67,7 @@ export async function GET(request, { params }) {
         const order = await Order.findById(orderId)
             .populate('address')
             .populate('items.product')
-            .populate('userId', 'email fullName'); // Populate user details for email
+            .populate('userId', 'email name'); // Use 'name' instead of 'fullName' to match the User schema
 
         if (!order) {
             return NextResponse.json({ success: false, message: "Order not found" });

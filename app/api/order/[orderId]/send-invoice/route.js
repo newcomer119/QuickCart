@@ -1,6 +1,7 @@
 import connectDb from "@/config/db";
 import authSeller from "@/lib/authSeller";
 import Order from "@/models/Order";
+import User from "@/models/Users"; // Import User model to ensure it's registered
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -25,7 +26,7 @@ export async function POST(request, { params }) {
         const order = await Order.findById(orderId)
             .populate('address')
             .populate('items.product')
-            .populate('userId', 'email fullName');
+            .populate('userId', 'email name'); // Use 'name' instead of 'fullName'
 
         if (!order) {
             return NextResponse.json({ success: false, message: "Order not found" });

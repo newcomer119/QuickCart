@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
     customOrderId: {type: String, required: true, unique: true}, // Custom formatted order ID
-    userId : {type:String, required : true, ref : 'User'},
+    userId : {type:String, required : true, ref : 'User'}, // Reference to User model
     items:[{
         product : {type:String, required : true, ref : 'Product'},
         quantity : {type : Number, required : true},
@@ -20,10 +20,11 @@ const orderSchema = new mongoose.Schema({
     paymentStatus : {type : String, required : true, default : 'PENDING', enum : ['PENDING', 'COMPLETED', 'FAILED']},
     razorpayOrderId : {type : String},
     razorpayPaymentId : {type : String},
-    data : {type : Object, required : true},
-    date : {type : Number, required : true}
+    data : {type : Object, required: true},
+    date : {type : Number, required: true}
 })
 
+// Ensure the model is properly registered
 const Order = mongoose.models.order || mongoose.model('order', orderSchema)
 
 export default Order 
