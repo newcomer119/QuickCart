@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
     customOrderId: {type: String, required: true, unique: true}, // Custom formatted order ID
-    userId : {type:String, required : true, ref : 'user'},
+    userId : {type:String, required : true, ref : 'User'},
     items:[{
         product : {type:String, required : true, ref : 'Product'},
         quantity : {type : Number, required : true},

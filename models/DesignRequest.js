@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const designRequestSchema = new mongoose.Schema({
-    userId: { type: String, required: true, ref: 'user' },
+    userId: { type: String, required: true, ref: 'User' }, // Changed from 'user' to 'User'
     designName: { type: String, required: true },
     description: { type: String },
     material: { type: String, required: true, enum: ['PLA', 'ABS', 'PETG', 'TPU', 'Resin'] },
