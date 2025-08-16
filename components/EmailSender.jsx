@@ -21,12 +21,12 @@ const EmailSender = ({ orderDetails }) => {
                     name: item.name,
                     units: item.quantity,
                     price: item.price,
-                    image_url: item.image || 'https://via.placeholder.com/64x64?text=Product'
+                    image_url: item.image || 'https://via.placeholder.com/64x64?text=Product' // fallback image
                 }));
 
-                // Calculate shipping and tax
-                const shipping = 50;
-                const gst = Math.round(orderDetails.totalAmount * 0.18);
+                // Calculate shipping and tax (you can adjust these values)
+                const shipping = 50; // Default shipping cost
+                const gst = Math.round(orderDetails.totalAmount * 0.18); // 18% GST
                 const subtotal = orderDetails.totalAmount - shipping - gst;
 
                 const templateParams = {
@@ -47,13 +47,13 @@ const EmailSender = ({ orderDetails }) => {
 
                 // Try the send method first
                 try {
-                    const response = await emailjs.send(
+                    await emailjs.send(
                         'service_ktyfsb8',
                         'template_9dd766b',
                         templateParams
                     );
                 } catch (sendError) {
-                    // Create a temporary form element as fallback
+                    // Create a temporary form element
                     const form = document.createElement('form');
                     form.style.display = 'none';
                     
@@ -70,7 +70,7 @@ const EmailSender = ({ orderDetails }) => {
                     
                     document.body.appendChild(form);
                     
-                    const formResponse = await emailjs.sendForm(
+                    await emailjs.sendForm(
                         'service_ktyfsb8',
                         'template_9dd766b',
                         form
@@ -79,8 +79,7 @@ const EmailSender = ({ orderDetails }) => {
                     document.body.removeChild(form);
                 }
             } catch (error) {
-                // Silently handle errors in production
-                // You could optionally add error tracking here (like Sentry)
+                // Silent fail - don't show errors to user
             }
         };
 
@@ -89,7 +88,7 @@ const EmailSender = ({ orderDetails }) => {
         }
     }, [orderDetails, user]);
 
-    return null;
+    return null; // This component doesn't render anything
 };
 
 export default EmailSender;

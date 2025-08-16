@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
@@ -10,6 +11,7 @@ import axios from "axios";
 
 const Orders = () => {
   const { currency, getToken, user } = useAppContext();
+  const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +34,10 @@ const Orders = () => {
     }
   };
 
+  const handleOrderClick = (orderId) => {
+    router.push(`/seller/orders/${orderId}`);
+  };
+
   useEffect(() => {
     if (user) {
       fetchSellerOrders();
@@ -52,7 +58,8 @@ const Orders = () => {
               orders.map((order, index) => (
                 <div
                   key={index}
-                  className="flex flex-col md:flex-row gap-5 justify-between p-5 border-t border-gray-300"
+                  onClick={() => handleOrderClick(order._id)}
+                  className="flex flex-col md:flex-row gap-5 justify-between p-5 border-t border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
                 >
                   <div className="flex-1 flex gap-5 max-w-80">
                     <Image
@@ -60,21 +67,16 @@ const Orders = () => {
                       src={assets.box_icon}
                       alt="box_icon"
                     />
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-lg font-bold text-orange-600">
-                          Order #{order.customOrderId || 'N/A'}
-                        </span>
-                        <span className="font-medium">
-                          {order.items
-                            .map(
-                              (item) => (item.product?.name || 'Product Name Unavailable') + ` x ${item.quantity}`
-                            )
-                            .join(", ")}
-                        </span>
-                      </div>
+                    <p className="flex flex-col gap-3">
+                      <span className="font-medium">
+                        {order.items
+                          .map(
+                            (item) => (item.product?.name || 'Product Name Unavailable') + ` x ${item.quantity}`
+                          )
+                          .join(", ")}
+                      </span>
                       <span>Items : {order.items.length}</span>
-                    </div>
+                    </p>
                   </div>
                   <div>
                     <p>
@@ -89,40 +91,19 @@ const Orders = () => {
                       <span>{order.address?.phoneNumber || 'Phone Unavailable'}</span>
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between gap-4">
-                        <span>Subtotal:</span>
-                        <span>{currency}{order.subtotal || 0}</span>
-                      </div>
-                      <div className="flex justify-between gap-4">
-                        <span>GST (18%):</span>
-                        <span>{currency}{order.gst || 0}</span>
-                      </div>
-                      <div className="flex justify-between gap-4">
-                        <span>Delivery:</span>
-                        <span>{currency}{order.deliveryCharges || 0}</span>
-                      </div>
-                      {order.discount > 0 && (
-                        <div className="flex justify-between gap-4 text-green-600">
-                          <span>Discount:</span>
-                          <span>-{currency}{order.discount}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between gap-4 font-medium border-t pt-1">
-                        <span>Total:</span>
-                        <span>{currency}{order.amount}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <p className="font-medium my-auto">
+                    {currency}
+                    {order.amount}
+                  </p>
                   <div>
                     <p className="flex flex-col">
                       <span>Method : {order.paymentMethod}</span>
                       <span>
                         Date : {new Date(order.date).toLocaleDateString()}
                       </span>
-                      <span>Payment : {order.paymentStatus}</span>
-                      <span>Status : {order.status}</span>
+                      <span className={`font-medium ${order.paymentStatus === 'COMPLETED' ? 'text-green-600' : 'text-orange-600'}`}>
+                        Payment : {order.paymentStatus}
+                      </span>
                     </p>
                   </div>
                 </div>
