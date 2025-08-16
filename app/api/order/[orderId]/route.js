@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import connectDb from '@/config/db';
 import Order from '@/models/Order';
+import User from '@/models/Users';
 import { getAuth } from '@clerk/nextjs/server';
 import authSeller from "@/lib/authSeller";
-import User from "@/models/Users"; // Import User model to ensure it's registered
 
 export async function DELETE(request, { params }) {
     try {
@@ -66,22 +66,38 @@ export async function GET(request, { params }) {
         // Find order and populate related data
         const order = await Order.findById(orderId)
             .populate('address')
-            .populate('items.product')
-            .populate('userId', 'email name'); // Use 'name' instead of 'fullName' to match the User schema
+            .populate('items.product');
 
         if (!order) {
             return NextResponse.json({ success: false, message: "Order not found" });
         }
 
-        // Add user email to the order object for easy access
-        const orderWithUserEmail = {
+        // Fetch user data separately since userId is a String
+        let userEmail = 'N/A';
+        let userName = 'N/A';
+        
+        if (order.userId) {
+            try {
+                const user = await User.findById(order.userId);
+                if (user) {
+                    userEmail = user.email || 'N/A';
+                    userName = user.name || 'N/A';
+                }
+            } catch (userError) {
+                console.error("Error fetching user:", userError);
+            }
+        }
+
+        // Add user email and name to the order object for easy access
+        const orderWithUserData = {
             ...order.toObject(),
-            userEmail: order.userId?.email || 'N/A'
+            userEmail: userEmail,
+            userName: userName
         };
 
         return NextResponse.json({ 
             success: true, 
-            order: orderWithUserEmail 
+            order: orderWithUserData 
         });
 
     } catch (error) {

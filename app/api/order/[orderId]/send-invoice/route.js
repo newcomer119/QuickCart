@@ -1,7 +1,7 @@
 import connectDb from "@/config/db";
 import authSeller from "@/lib/authSeller";
 import Order from "@/models/Order";
-import User from "@/models/Users"; // Import User model to ensure it's registered
+import User from "@/models/Users";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -25,15 +25,31 @@ export async function POST(request, { params }) {
         // Find order and populate related data
         const order = await Order.findById(orderId)
             .populate('address')
-            .populate('items.product')
-            .populate('userId', 'email name'); // Use 'name' instead of 'fullName'
+            .populate('items.product');
 
         if (!order) {
             return NextResponse.json({ success: false, message: "Order not found" });
         }
 
+        // Fetch user data separately since userId is a String
+        let userEmail = 'N/A';
+        let userName = 'N/A';
+        
+        if (order.userId) {
+            try {
+                const user = await User.findById(order.userId);
+                if (user) {
+                    userEmail = user.email || 'N/A';
+                    userName = user.name || 'N/A';
+                }
+            } catch (userError) {
+                console.error("Error fetching user:", userError);
+            }
+        }
+
         // TODO: Implement EmailJS service call here
         // This is where you'll add your EmailJS service to send GST invoice
+        // You now have access to userEmail and userName for the invoice
         
         // For now, return success
         return NextResponse.json({ 

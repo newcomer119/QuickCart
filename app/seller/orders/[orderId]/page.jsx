@@ -97,16 +97,29 @@ const OrderDetails = () => {
             </button>
             <h2 className="text-xl font-semibold">Order Details</h2>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={sendGSTInvoice}
-              disabled={sendingInvoice}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {sendingInvoice ? "Sending..." : "Send GST Invoice"}
-            </button>
-          </div>
         </div>
+
+        {/* Customer Email - Prominent Display */}
+        {order.userEmail && order.userEmail !== 'N/A' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-blue-600 font-medium">Customer Email</p>
+                <p className="text-lg font-semibold text-blue-800">{order.userEmail}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-blue-600">Ready for Invoice</p>
+                <button
+                  onClick={sendGSTInvoice}
+                  disabled={sendingInvoice}
+                  className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm"
+                >
+                  {sendingInvoice ? "Sending..." : "Send GST Invoice"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Order Summary Card */}
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -143,9 +156,10 @@ const OrderDetails = () => {
           <h3 className="text-lg font-semibold mb-4">Customer Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p><span className="font-medium">Name:</span> {order.address?.fullName || 'N/A'}</p>
+              <p><span className="font-medium">Customer Name:</span> {order.address?.fullName || 'N/A'}</p>
+              <p><span className="font-medium">Account Name:</span> {order.userName || 'N/A'}</p>
               <p><span className="font-medium">Phone:</span> {order.address?.phoneNumber || 'N/A'}</p>
-              <p><span className="font-medium">Email:</span> {order.userEmail || 'N/A'}</p>
+              <p className="text-blue-600 font-medium"><span className="font-medium">Email:</span> {order.userEmail || 'N/A'}</p>
             </div>
             <div>
               <p><span className="font-medium">Address:</span></p>
