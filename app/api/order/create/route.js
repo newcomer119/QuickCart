@@ -42,15 +42,11 @@ export async function POST(request) {
         }, 0)
 
         // Calculate payment breakdown
-        const gst = Math.floor(subtotal * 0.18); // 18% GST
-        const deliveryCharges = 0; // Free delivery for now
         const discountAmount = discount || 0;
-        const totalAmount = subtotal + gst + deliveryCharges - discountAmount;
-        
-        // Remove the duplicate discount application since it's already included above
-        // if (couponCode && discount) {
-        //     totalAmount = totalAmount - discount;
-        // }
+        const discountedSubtotal = subtotal - discountAmount; // Apply discount to subtotal first
+        const gst = Math.floor(discountedSubtotal * 0.18); // Calculate GST on discounted amount
+        const deliveryCharges = 0; // Free delivery for now
+        const totalAmount = discountedSubtotal + gst + deliveryCharges; // Total = discounted subtotal + GST + delivery
 
         // Get user details for email
         const user = await User.findById(userId);
@@ -82,7 +78,7 @@ export async function POST(request) {
             address,
             items,
             amount: totalAmount,
-            subtotal: subtotal,
+            subtotal: discountedSubtotal, // Store the discounted subtotal
             gst: gst,
             deliveryCharges: deliveryCharges,
             discount: discountAmount,

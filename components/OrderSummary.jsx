@@ -94,9 +94,10 @@ const OrderSummary = () => {
 
   const getFinalAmount = () => {
     const subtotal = getCartAmount();
-    const gst = Math.floor(subtotal * 0.18);
     const discount = calculateDiscount();
-    return subtotal + gst - discount;
+    const discountedSubtotal = subtotal - discount; // Apply discount to subtotal first
+    const gst = Math.floor(discountedSubtotal * 0.18); // Calculate GST on discounted amount
+    return discountedSubtotal + gst; // Return discounted subtotal + GST
   };
 
   const createOrderAfterPayment = async (paymentData) => {
@@ -376,34 +377,6 @@ const OrderSummary = () => {
           </div>
         </div>
 
-        <div>
-          <label className="text-base font-medium uppercase text-gray-600 block mb-2">
-            Promo Code
-          </label>
-          <div className="flex flex-col items-start gap-3">
-            <input
-              type="text"
-              placeholder="Enter promo code"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              className="flex-grow w-full outline-none p-2.5 text-gray-600 border"
-            />
-            <button 
-              onClick={handleApplyCoupon}
-              className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700"
-            >
-              Apply
-            </button>
-          </div>
-          {appliedCoupon && (
-            <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
-              <p className="text-green-800 text-sm">
-                Coupon "{appliedCoupon.code}" applied! {appliedCoupon.discount}% off
-              </p>
-            </div>
-          )}
-        </div>
-
         <hr className="border-gray-500/30 my-5" />
 
         <div className="space-y-4">
@@ -422,9 +395,39 @@ const OrderSummary = () => {
             <p className="text-gray-600">GST (18%)</p>
             <p className="font-medium text-gray-800">
               {currency}
-              {Math.floor(getCartAmount() * 0.18)}
+              {Math.floor((getCartAmount() - calculateDiscount()) * 0.18)}
             </p>
           </div>
+          
+          {/* Promo Code Section - Moved here after GST */}
+          <div className="border-t pt-4">
+            <label className="text-base font-medium uppercase text-gray-600 block mb-2">
+              Promo Code
+            </label>
+            <div className="flex flex-col items-start gap-3">
+              <input
+                type="text"
+                placeholder="Enter promo code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="flex-grow w-full outline-none p-2.5 text-gray-600 border"
+              />
+              <button 
+                onClick={handleApplyCoupon}
+                className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700"
+              >
+                Apply
+              </button>
+            </div>
+            {appliedCoupon && (
+              <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded">
+                <p className="text-green-800 text-sm">
+                  Coupon "{appliedCoupon.code}" applied! {appliedCoupon.discount}% off
+                </p>
+              </div>
+            )}
+          </div>
+          
           {appliedCoupon && (
             <div className="flex justify-between text-green-600">
               <p>Discount ({appliedCoupon.discount}%)</p>
