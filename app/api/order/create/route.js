@@ -23,14 +23,14 @@ export async function POST(request) {
         console.log('Order model available:', !!Order);
         console.log('Order model name:', Order.modelName);
         
-        const { userId } = getAuth(request)
+        const { userId } = getAuth(request);
         console.log('User ID from auth:', userId);
         
-        const { address, items, paymentMethod, paymentId, orderId, signature, couponCode, discount } = await request.json()
+        const { address, items, paymentMethod, paymentId, orderId, signature, couponCode, discount } = await request.json();
         console.log('Request data received:', { address, itemsCount: items?.length, paymentMethod, couponCode, discount });
 
         if (!address || items.length === 0) {
-            return NextResponse.json({ success: false, message: 'Invalid Data' })
+            return NextResponse.json({ success: false, message: 'Invalid Data' });
         }
 
         // calculate amount using items
@@ -283,12 +283,11 @@ export async function POST(request) {
             throw createError;
         }
 
-        // Fetch user to clear cart items
-        const user = await User.findById(userId);
+        // Clear user cart items (user variable already defined above)
         if (user) {
             // clear user cart for all completed orders
-            user.cartItems = {}
-            await user.save()
+            user.cartItems = {};
+            await user.save();
             console.log('User cart cleared successfully');
         } else {
             console.log('User not found for cart clearing, continuing...');
@@ -310,7 +309,7 @@ export async function POST(request) {
                 paymentMethod,
                 date: Date.now()
             }
-        })
+        });
 
         console.log('Order created successfully and Inngest event sent');
 
@@ -318,10 +317,10 @@ export async function POST(request) {
             success: true, 
             message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
             order
-        })
+        });
 
     } catch (error) {
-        console.error("Error creating order:", error)
+        console.error("Error creating order:", error);
         
         // Log detailed error information
         if (error.errors) {
@@ -335,6 +334,6 @@ export async function POST(request) {
             success: false, 
             message: error.message || 'Failed to create order',
             details: error.errors || {}
-        })
+        });
     }
 }
