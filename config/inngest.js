@@ -177,8 +177,8 @@ export const createUserOrder = inngest.createFunction(
           eventData: event.data,
           hasCustomOrderId: !!event.data.customOrderId,
           hasSubtotal: !!event.data.subtotal,
-          customOrderIdValue: event.data.customOrderId,
-          subtotalValue: event.data.subtotal,
+          customOrderIdValue: event.data.customOrderId || 'NOT_PROVIDED',
+          subtotalValue: event.data.subtotal || 'NOT_PROVIDED',
           customOrderIdType: typeof event.data.customOrderId,
           subtotalType: typeof event.data.subtotal
         });
@@ -187,13 +187,17 @@ export const createUserOrder = inngest.createFunction(
       // Create summaries without any database operations
       const orderSummaries = events.map((event) => {
         const summary = {
-          customOrderId: event.data.customOrderId,
+          customOrderId: event.data.customOrderId || 'LEGACY_ORDER',
           userId: event.data.userId,
           amount: event.data.amount,
-          subtotal: event.data.subtotal,
-          itemsCount: event.data.items?.length,
+          subtotal: event.data.subtotal || 0,
+          gst: event.data.gst || 0,
+          deliveryCharges: event.data.deliveryCharges || 0,
+          discount: event.data.discount || 0,
+          itemsCount: event.data.items?.length || 0,
           status: 'Processed by Inngest (Logging Only)',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          hasNewFields: !!(event.data.subtotal && event.data.customOrderId)
         };
         
         console.log('Order summary created:', summary);
@@ -216,7 +220,9 @@ export const createUserOrder = inngest.createFunction(
         message: 'Orders already created in main API, Inngest only logged the events',
         note: 'No database operations performed by Inngest',
         functionId: 'create-user-order',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        newFieldsCount: orderSummaries.filter(s => s.hasNewFields).length,
+        legacyOrdersCount: orderSummaries.filter(s => !s.hasNewFields).length
       };
       
     } catch (error) {

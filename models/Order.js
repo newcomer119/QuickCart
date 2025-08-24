@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 
 const orderSchema = new mongoose.Schema({
-    customOrderId: {type: String, required: true, unique: true}, // Custom formatted order ID
+    customOrderId: {type: String, required: false, unique: false}, // Made optional for existing orders
     userId : {type:String, required : true, ref : 'User'}, // Reference to User model
     items:[{
         product : {type:String, required : true, ref : 'Product'},
@@ -10,14 +10,14 @@ const orderSchema = new mongoose.Schema({
         color: {type: String}
     }],
     amount : {type : Number, required : true}, // Final total amount
-    subtotal : {type : Number, required : true}, // Subtotal before taxes and charges
-    gst : {type : Number, required : true, default: 0}, // GST amount
-    deliveryCharges : {type : Number, required : true, default: 0}, // Delivery charges
-    discount : {type : Number, required : true, default: 0}, // Discount amount
-    address : {type : String, ref : 'address', required : true},
-    status : {type : String, required : true, default : "Order Placed"},
-    paymentMethod : {type : String, required : true, enum : ['COD', 'ONLINE']},
-    paymentStatus : {type : String, required : true, default : 'PENDING', enum : ['PENDING', 'COMPLETED', 'FAILED']},
+    subtotal : {type : Number, required: false, default: 0}, // Made optional for existing orders
+    gst : {type : Number, required: false, default: 0}, // Made optional for existing orders
+    deliveryCharges : {type : Number, required: false, default: 0}, // Made optional for existing orders
+    discount : {type : Number, required: false, default: 0}, // Made optional for existing orders
+    address : {type : String, ref : 'address', required: true},
+    status : {type : String, required: true, default : "Order Placed"},
+    paymentMethod : {type : String, required: true, enum : ['COD', 'ONLINE']},
+    paymentStatus : {type : String, required: true, default : 'PENDING', enum : ['PENDING', 'COMPLETED', 'FAILED']},
     razorpayOrderId : {type : String},
     razorpayPaymentId : {type : String},
     data : {type : Object, required: true},
