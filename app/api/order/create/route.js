@@ -5,9 +5,8 @@ import { getAuth } from "@clerk/nextjs/server";
 import NextResponse from "next/server";
 import connectDb from "@/config/db";
 import Order from "@/models/Order";
-import { sendOrderConfirmationEmail } from "@/lib/emailjs";
-import Address from "@/models/Address";
 import mongoose from "mongoose";
+import { generateCustomOrderId } from "@/lib/orderIdGenerator";
 
 function isValidObjectId(id) {
     return mongoose.Types.ObjectId.isValid(id);
@@ -15,9 +14,20 @@ function isValidObjectId(id) {
 
 export async function POST(request) {
     try {
+        console.log('Starting order creation process...');
+        
         await connectDb();
+        console.log('Database connected successfully');
+        
+        // Verify Order model is available
+        console.log('Order model available:', !!Order);
+        console.log('Order model name:', Order.modelName);
+        
         const { userId } = getAuth(request)
+        console.log('User ID from auth:', userId);
+        
         const { address, items, paymentMethod, paymentId, orderId, signature, couponCode, discount } = await request.json()
+        console.log('Request data received:', { address, itemsCount: items?.length, paymentMethod, couponCode, discount });
 
         if (!address || items.length === 0) {
             return NextResponse.json({ success: false, message: 'Invalid Data' })
@@ -25,6 +35,8 @@ export async function POST(request) {
 
         // calculate amount using items
         let subtotal = 0;
+        console.log('Starting subtotal calculation for', items.length, 'items');
+        
         for (const item of items) {
             // Extract productId if item.product contains an underscore
             let productId = item.product;
@@ -38,7 +50,16 @@ export async function POST(request) {
             if (!product) {
                 throw new Error(`Product not found for id: ${productId}`);
             }
-            subtotal += product.offerPrice * item.quantity;
+            const itemTotal = product.offerPrice * item.quantity;
+            subtotal += itemTotal;
+            console.log(`Item: ${product.name}, Price: ${product.offerPrice}, Qty: ${item.quantity}, Total: ${itemTotal}, Running subtotal: ${subtotal}`);
+        }
+
+        console.log('Final subtotal calculated:', subtotal);
+
+        // Ensure subtotal is a valid number
+        if (typeof subtotal !== 'number' || isNaN(subtotal)) {
+            throw new Error('Invalid subtotal calculation - subtotal is not a number');
         }
 
         // Calculate payment breakdown
@@ -47,6 +68,15 @@ export async function POST(request) {
         const gst = Math.floor(discountedSubtotal * 0.18); // Calculate GST on discounted amount
         const deliveryCharges = 0; // Free delivery for now
         const totalAmount = discountedSubtotal + gst + deliveryCharges; // Total = discounted subtotal + GST + delivery
+
+        console.log('Payment breakdown calculation:', {
+            originalSubtotal: subtotal,
+            discountAmount,
+            discountedSubtotal,
+            gst,
+            deliveryCharges,
+            totalAmount
+        });
 
         // Validate calculations
         if (isNaN(subtotal) || subtotal < 0) {
@@ -66,7 +96,22 @@ export async function POST(request) {
         }
 
         // Generate custom order ID
-        const customOrderId = `ORDER-${Date.now()}`;
+        let customOrderId;
+        try {
+            customOrderId = await generateCustomOrderId();
+            console.log('Generated custom order ID:', customOrderId);
+        } catch (error) {
+            console.error('Error generating custom order ID:', error);
+            // Fallback to timestamp-based ID if generation fails
+            customOrderId = `ORDER-${Date.now()}`;
+        }
+
+        // Ensure we have a valid customOrderId
+        if (!customOrderId) {
+            customOrderId = `ORDER-${Date.now()}`;
+        }
+
+        console.log('Final customOrderId:', customOrderId);
 
         // Create order with appropriate status based on payment method
         let orderData = {
@@ -91,6 +136,52 @@ export async function POST(request) {
             amount: totalAmount,
             gst,
             deliveryCharges,
+            discount: discountAmount,
+            userId,
+            address,
+            items: items.length
+        });
+
+        // Validate order data before creation
+        if (!customOrderId || !userId || !address || !items || items.length === 0) {
+            throw new Error('Missing required order data');
+        }
+
+        if (typeof discountedSubtotal !== 'number' || discountedSubtotal < 0) {
+            throw new Error('Invalid subtotal value');
+        }
+
+        if (typeof totalAmount !== 'number' || totalAmount < 0) {
+            throw new Error('Invalid total amount value');
+        }
+
+        // Additional validation for required fields
+        if (!customOrderId || typeof customOrderId !== 'string') {
+            throw new Error('Invalid customOrderId');
+        }
+
+        if (!userId || typeof userId !== 'string') {
+            throw new Error('Invalid userId');
+        }
+
+        if (!address || typeof address !== 'string') {
+            throw new Error('Invalid address');
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            throw new Error('Invalid items array');
+        }
+
+        // Log the final order data for debugging
+        console.log('Final order data validation:', {
+            customOrderId: !!customOrderId,
+            userId: !!userId,
+            address: !!address,
+            itemsCount: items.length,
+            subtotal: discountedSubtotal,
+            amount: totalAmount,
+            gst: gst,
+            deliveryCharges: deliveryCharges,
             discount: discountAmount
         });
 
@@ -106,64 +197,23 @@ export async function POST(request) {
             orderData.status = 'Order Placed';
         }
 
-        const order = await Order.create(orderData);
+        console.log('About to create order with data:', orderData);
+
+        let order;
+        try {
+            order = await Order.create(orderData);
+            console.log('Order created successfully:', order._id);
+        } catch (createError) {
+            console.error('Error creating order in database:', createError);
+            if (createError.errors) {
+                console.error('Validation errors:', createError.errors);
+            }
+            throw createError;
+        }
 
         // clear user cart for all completed orders
         user.cartItems = {}
         await user.save()
-
-        // Get product details for email
-        const itemsWithDetails = await Promise.all(items.map(async (item) => {
-            // Extract productId if item.product contains an underscore
-            let productId = item.product;
-            if (typeof productId === 'string' && productId.includes('_')) {
-                productId = productId.split('_')[0];
-            }
-            if (!isValidObjectId(productId)) {
-                throw new Error(`Invalid product id: ${productId}`);
-            }
-            const product = await Product.findById(productId);
-            if (!product) {
-                throw new Error(`Product not found for id: ${productId}`);
-            }
-            return {
-                name: product.name,
-                quantity: item.quantity,
-                price: product.offerPrice,
-                color: item.color || null
-            };
-        }));
-
-        // Get full address details
-        const addressDetails = await Address.findById(address);
-        const formattedAddress = addressDetails ? 
-            `${addressDetails.fullName}, ${addressDetails.area}, ${addressDetails.city}, ${addressDetails.state}, ${addressDetails.pincode}` 
-            : 'Address not found';
-
-        // Prepare order details for email
-        const orderDetails = {
-            email: user.email,
-            orderNumber: customOrderId, // Use custom order ID instead of MongoDB _id
-            totalAmount,
-            subtotal: subtotal,
-            gst: gst,
-            deliveryCharges: deliveryCharges,
-            discount: discountAmount,
-            items: itemsWithDetails,
-            shippingAddress: formattedAddress,
-            paymentMethod
-        };
-
-        // Send order confirmation email
-        try {
-            const emailResult = await sendOrderConfirmationEmail(orderDetails);
-
-            if (!emailResult.success) {
-                console.error('Failed to send email:', emailResult.error);
-            }
-        } catch (emailError) {
-            console.error('Error in email sending:', emailError);
-        }
 
         await inngest.send({
             name: "order/created",
@@ -173,7 +223,7 @@ export async function POST(request) {
                 address,
                 items,
                 amount: totalAmount,
-                subtotal: subtotal,
+                subtotal: discountedSubtotal, // Use discountedSubtotal, not subtotal
                 gst: gst,
                 deliveryCharges: deliveryCharges,
                 discount: discountAmount,
@@ -185,8 +235,7 @@ export async function POST(request) {
         return NextResponse.json({ 
             success: true, 
             message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
-            order,
-            orderDetails
+            order
         })
 
     } catch (error) {

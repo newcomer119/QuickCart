@@ -264,9 +264,21 @@ const OrderSummary = () => {
         toast.success(data.message)
         setCartItems({})
         
-        // Store order details for email
-        if (data.orderDetails) {
-          localStorage.setItem('lastOrder', JSON.stringify(data.orderDetails));
+        // Send order confirmation email
+        try {
+          const emailResponse = await axios.post('/api/order/send-email', {
+            orderId: data.order._id
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (emailResponse.data.success) {
+            // Store order details for email
+            localStorage.setItem('lastOrder', JSON.stringify(emailResponse.data.orderDetails));
+          }
+        } catch (emailError) {
+          console.error('Failed to send order confirmation email:', emailError);
+          // Don't show error to user as order was successful
         }
         
         router.push('/order-placed')
