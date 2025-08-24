@@ -2,7 +2,7 @@ import { inngest } from "@/config/inngest";
 import Product from "@/models/Product";
 import User from "@/models/Users";
 import { getAuth } from "@clerk/nextjs/server";
-import NextResponse from "next/server";
+import { NextResponse } from "next/server";
 import connectDb from "@/config/db";
 import Order from "@/models/Order";
 import mongoose from "mongoose";
@@ -313,11 +313,34 @@ export async function POST(request) {
 
         console.log('Order created successfully and Inngest event sent');
 
-        return NextResponse.json({ 
-            success: true, 
-            message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
-            order
-        });
+        // Debug NextResponse
+        console.log('NextResponse available:', !!NextResponse);
+        console.log('NextResponse type:', typeof NextResponse);
+        console.log('NextResponse.json available:', !!NextResponse?.json);
+
+        // Try to return response
+        try {
+            const response = NextResponse.json({ 
+                success: true, 
+                message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
+                order
+            });
+            console.log('Response created successfully:', !!response);
+            return response;
+        } catch (responseError) {
+            console.error('Error creating response:', responseError);
+            // Fallback response
+            return new Response(JSON.stringify({ 
+                success: true, 
+                message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
+                order
+            }), {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
 
     } catch (error) {
         console.error("Error creating order:", error);
@@ -330,10 +353,32 @@ export async function POST(request) {
             console.error("Error message:", error.message);
         }
         
-        return NextResponse.json({ 
-            success: false, 
-            message: error.message || 'Failed to create order',
-            details: error.errors || {}
-        });
+        // Debug NextResponse in error case
+        console.log('NextResponse available in error handler:', !!NextResponse);
+        console.log('NextResponse type in error handler:', typeof NextResponse);
+        
+        // Try to return error response
+        try {
+            const errorResponse = NextResponse.json({ 
+                success: false, 
+                message: error.message || 'Failed to create order',
+                details: error.errors || {}
+            });
+            console.log('Error response created successfully:', !!errorResponse);
+            return errorResponse;
+        } catch (responseError) {
+            console.error('Error creating error response:', responseError);
+            // Fallback error response
+            return new Response(JSON.stringify({ 
+                success: false, 
+                message: error.message || 'Failed to create order',
+                details: error.errors || {}
+            }), {
+                status: 500,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
     }
 }
