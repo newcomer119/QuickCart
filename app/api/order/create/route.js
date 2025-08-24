@@ -283,9 +283,16 @@ export async function POST(request) {
             throw createError;
         }
 
-        // clear user cart for all completed orders
-        user.cartItems = {}
-        await user.save()
+        // Fetch user to clear cart items
+        const user = await User.findById(userId);
+        if (user) {
+            // clear user cart for all completed orders
+            user.cartItems = {}
+            await user.save()
+            console.log('User cart cleared successfully');
+        } else {
+            console.log('User not found for cart clearing, continuing...');
+        }
 
         // Send event to Inngest for background processing
         await inngest.send({
