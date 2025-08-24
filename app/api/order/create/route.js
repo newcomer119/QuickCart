@@ -78,6 +78,14 @@ export async function POST(request) {
             totalAmount
         });
 
+        // Additional validation for subtotal
+        console.log('Subtotal validation:', {
+            subtotal: subtotal,
+            subtotalType: typeof subtotal,
+            isNaN: isNaN(subtotal),
+            isFinite: isFinite(subtotal)
+        });
+
         // Validate calculations
         if (isNaN(subtotal) || subtotal < 0) {
             throw new Error('Invalid subtotal calculation');
@@ -87,6 +95,17 @@ export async function POST(request) {
         }
         if (isNaN(totalAmount) || totalAmount < 0) {
             throw new Error('Invalid total amount calculation');
+        }
+
+        // Ensure all values are numbers
+        if (typeof subtotal !== 'number' || !isFinite(subtotal)) {
+            throw new Error('Subtotal must be a valid number');
+        }
+        if (typeof discountedSubtotal !== 'number' || !isFinite(discountedSubtotal)) {
+            throw new Error('Discounted subtotal must be a valid number');
+        }
+        if (typeof totalAmount !== 'number' || !isFinite(totalAmount)) {
+            throw new Error('Total amount must be a valid number');
         }
 
         // Get user details for email
@@ -100,6 +119,11 @@ export async function POST(request) {
         try {
             customOrderId = await generateCustomOrderId();
             console.log('Generated custom order ID:', customOrderId);
+            
+            // Validate the generated ID
+            if (!customOrderId || typeof customOrderId !== 'string') {
+                throw new Error('Generated customOrderId is invalid');
+            }
         } catch (error) {
             console.error('Error generating custom order ID:', error);
             // Fallback to timestamp-based ID if generation fails
@@ -107,11 +131,13 @@ export async function POST(request) {
         }
 
         // Ensure we have a valid customOrderId
-        if (!customOrderId) {
+        if (!customOrderId || typeof customOrderId !== 'string') {
             customOrderId = `ORDER-${Date.now()}`;
         }
 
         console.log('Final customOrderId:', customOrderId);
+        console.log('customOrderId type:', typeof customOrderId);
+        console.log('customOrderId length:', customOrderId.length);
 
         // Create order with appropriate status based on payment method
         let orderData = {
@@ -198,6 +224,52 @@ export async function POST(request) {
         }
 
         console.log('About to create order with data:', orderData);
+
+        // Final validation before order creation
+        console.log('Final validation check:', {
+            customOrderId: {
+                value: customOrderId,
+                type: typeof customOrderId,
+                isValid: !!customOrderId && typeof customOrderId === 'string'
+            },
+            subtotal: {
+                value: discountedSubtotal,
+                type: typeof discountedSubtotal,
+                isValid: typeof discountedSubtotal === 'number' && isFinite(discountedSubtotal)
+            },
+            amount: {
+                value: totalAmount,
+                type: typeof totalAmount,
+                isValid: typeof totalAmount === 'number' && isFinite(totalAmount)
+            },
+            userId: {
+                value: userId,
+                type: typeof userId,
+                isValid: !!userId && typeof userId === 'string'
+            },
+            address: {
+                value: address,
+                type: typeof address,
+                isValid: !!address && typeof address === 'string'
+            }
+        });
+
+        // Double-check all required fields
+        if (!customOrderId || typeof customOrderId !== 'string') {
+            throw new Error(`Invalid customOrderId: ${customOrderId}`);
+        }
+        if (typeof discountedSubtotal !== 'number' || !isFinite(discountedSubtotal)) {
+            throw new Error(`Invalid subtotal: ${discountedSubtotal}`);
+        }
+        if (typeof totalAmount !== 'number' || !isFinite(totalAmount)) {
+            throw new Error(`Invalid totalAmount: ${totalAmount}`);
+        }
+        if (!userId || typeof userId !== 'string') {
+            throw new Error(`Invalid userId: ${userId}`);
+        }
+        if (!address || typeof address !== 'string') {
+            throw new Error(`Invalid address: ${address}`);
+        }
 
         let order;
         try {
