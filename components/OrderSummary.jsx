@@ -391,6 +391,18 @@ const OrderSummary = () => {
             <p className="text-gray-600">Shipping Fee</p>
             <p className="font-medium text-gray-800">Free</p>
           </div>
+          
+          {/* Discount line - Moved here below shipping fees */}
+          {appliedCoupon && (
+            <div className="flex justify-between text-green-600">
+              <p>Discount ({appliedCoupon.discount}%)</p>
+              <p className="font-medium">
+                -{currency}
+                {calculateDiscount()}
+              </p>
+            </div>
+          )}
+          
           <div className="flex justify-between">
             <p className="text-gray-600">GST (18%)</p>
             <p className="font-medium text-gray-800">
@@ -428,15 +440,6 @@ const OrderSummary = () => {
             )}
           </div>
           
-          {appliedCoupon && (
-            <div className="flex justify-between text-green-600">
-              <p>Discount ({appliedCoupon.discount}%)</p>
-              <p className="font-medium">
-                -{currency}
-                {calculateDiscount()}
-              </p>
-            </div>
-          )}
           <div className="flex justify-between text-lg md:text-xl font-medium border-t pt-3">
             <p>Total</p>
             <p>
