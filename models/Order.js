@@ -25,6 +25,6 @@ const orderSchema = new mongoose.Schema({
 })
 
 // Ensure the model is properly registered
-const Order = mongoose.models.order || mongoose.model('order', orderSchema)
+const Order = mongoose.models.Order || mongoose.model('Order', orderSchema)
 
 export default Order 

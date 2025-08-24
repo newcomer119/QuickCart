@@ -8,7 +8,6 @@ import Order from "@/models/Order";
 import { sendOrderConfirmationEmail } from "@/lib/emailjs";
 import Address from "@/models/Address";
 import mongoose from "mongoose";
-import { generateCustomOrderId } from "@/lib/orderIdGenerator";
 
 function isValidObjectId(id) {
     return mongoose.Types.ObjectId.isValid(id);
@@ -25,7 +24,8 @@ export async function POST(request) {
         }
 
         // calculate amount using items
-        const subtotal = await items.reduce(async (acc, item) => {
+        let subtotal = 0;
+        for (const item of items) {
             // Extract productId if item.product contains an underscore
             let productId = item.product;
             if (typeof productId === 'string' && productId.includes('_')) {
@@ -38,8 +38,8 @@ export async function POST(request) {
             if (!product) {
                 throw new Error(`Product not found for id: ${productId}`);
             }
-            return await acc + product.offerPrice * item.quantity
-        }, 0)
+            subtotal += product.offerPrice * item.quantity;
+        }
 
         // Calculate payment breakdown
         const discountAmount = discount || 0;
@@ -48,6 +48,17 @@ export async function POST(request) {
         const deliveryCharges = 0; // Free delivery for now
         const totalAmount = discountedSubtotal + gst + deliveryCharges; // Total = discounted subtotal + GST + delivery
 
+        // Validate calculations
+        if (isNaN(subtotal) || subtotal < 0) {
+            throw new Error('Invalid subtotal calculation');
+        }
+        if (isNaN(discountedSubtotal) || discountedSubtotal < 0) {
+            throw new Error('Invalid discounted subtotal calculation');
+        }
+        if (isNaN(totalAmount) || totalAmount < 0) {
+            throw new Error('Invalid total amount calculation');
+        }
+
         // Get user details for email
         const user = await User.findById(userId);
         if (!user) {
@@ -55,21 +66,7 @@ export async function POST(request) {
         }
 
         // Generate custom order ID
-        let customOrderId;
-        try {
-            customOrderId = await generateCustomOrderId();
-            
-            // Verify the generated ID is unique
-            const existingOrder = await Order.findOne({ customOrderId });
-            if (existingOrder) {
-                // If duplicate, generate a new one with timestamp
-                customOrderId = `ORDER-${Date.now()}`;
-            }
-        } catch (error) {
-            console.error('Error generating custom order ID:', error);
-            // Fallback to timestamp-based ID if generation fails
-            customOrderId = `ORDER-${Date.now()}`;
-        }
+        const customOrderId = `ORDER-${Date.now()}`;
 
         // Create order with appropriate status based on payment method
         let orderData = {
@@ -87,15 +84,22 @@ export async function POST(request) {
             data: { items, address, paymentMethod, couponCode, discount }
         };
 
+        // Debug logging
+        console.log('Order data being created:', {
+            customOrderId,
+            subtotal: discountedSubtotal,
+            amount: totalAmount,
+            gst,
+            deliveryCharges,
+            discount: discountAmount
+        });
+
         if (paymentMethod === 'ONLINE') {
             // For online payment, create completed order with payment details
             orderData.paymentStatus = 'COMPLETED';
             orderData.status = 'Order Placed';
-            orderData.paymentDetails = {
-                paymentId,
-                orderId,
-                signature
-            };
+            orderData.razorpayOrderId = orderId;
+            orderData.razorpayPaymentId = paymentId;
         } else {
             // For COD, create completed order
             orderData.paymentStatus = 'COMPLETED';
@@ -187,6 +191,19 @@ export async function POST(request) {
 
     } catch (error) {
         console.error("Error creating order:", error)
-        return NextResponse.json({ success: false, message: error.message })
+        
+        // Log detailed error information
+        if (error.errors) {
+            console.error("Validation errors:", error.errors);
+        }
+        if (error.message) {
+            console.error("Error message:", error.message);
+        }
+        
+        return NextResponse.json({ 
+            success: false, 
+            message: error.message || 'Failed to create order',
+            details: error.errors || {}
+        })
     }
 }

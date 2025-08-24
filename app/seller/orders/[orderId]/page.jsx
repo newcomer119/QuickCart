@@ -57,7 +57,11 @@ const OrderDetails = () => {
       });
 
       if (emailResult.success) {
-        toast.success("GST Invoice sent successfully!");
+        if (emailResult.note) {
+          toast.success(`GST Invoice sent successfully! ${emailResult.note}`);
+        } else {
+          toast.success("GST Invoice sent successfully!");
+        }
         setShowPDFModal(false);
         
         // Optionally, you can also call your API to log the invoice sent

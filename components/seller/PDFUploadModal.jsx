@@ -16,9 +16,9 @@ const PDFUploadModal = ({ isOpen, onClose, onSend, order, loading }) => {
         return;
       }
       
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('File size should be less than 10MB');
+      // Check file size (max 1MB for EmailJS compatibility)
+      if (file.size > 1 * 1024 * 1024) {
+        toast.error('File size should be less than 1MB for email compatibility');
         return;
       }
       
@@ -75,6 +75,12 @@ const PDFUploadModal = ({ isOpen, onClose, onSend, order, loading }) => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Upload GST Invoice PDF
           </label>
+          <div className="mb-2">
+            <p className="text-xs text-gray-500 mb-2">
+              <strong>Important:</strong> For EmailJS compatibility, PDF files must be under 1MB. 
+              Larger files will be sent without attachment.
+            </p>
+          </div>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
             <input
               type="file"
@@ -101,7 +107,7 @@ const PDFUploadModal = ({ isOpen, onClose, onSend, order, loading }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <p className="text-sm font-medium text-blue-600">Click to upload PDF</p>
-                  <p className="text-xs text-gray-500">PDF files only, max 10MB</p>
+                  <p className="text-xs text-gray-500">PDF files only, max 1MB</p>
                 </div>
               )}
             </label>
