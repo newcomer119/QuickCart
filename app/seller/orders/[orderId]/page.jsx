@@ -8,6 +8,8 @@ import Footer from "@/components/seller/Footer";
 import Loading from "@/components/Loading";
 import toast from "react-hot-toast";
 import axios from "axios";
+import PDFUploadModal from "@/components/seller/PDFUploadModal";
+import { sendGSTInvoiceEmail } from "@/lib/emailjs";
 
 const OrderDetails = () => {
   const { orderId } = useParams();
@@ -16,6 +18,7 @@ const OrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sendingInvoice, setSendingInvoice] = useState(false);
+  const [showPDFModal, setShowPDFModal] = useState(false);
 
   const fetchOrderDetails = async () => {
     try {
@@ -38,23 +41,46 @@ const OrderDetails = () => {
     }
   };
 
-  const sendGSTInvoice = async () => {
+  const handleSendGSTInvoice = async (pdfFile) => {
     try {
       setSendingInvoice(true);
-      const token = await getToken();
       
-      const response = await axios.post(`/api/order/${orderId}/send-invoice`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+      // Send email using EmailJS
+      const emailResult = await sendGSTInvoiceEmail({
+        email: order.userEmail,
+        orderNumber: order.customOrderId || order._id,
+        customerName: order.userName || order.address?.fullName,
+        totalAmount: order.amount,
+        items: order.items,
+        address: order.address,
+        pdfFile: pdfFile
       });
-      
-      if (response.data.success) {
+
+      if (emailResult.success) {
         toast.success("GST Invoice sent successfully!");
+        setShowPDFModal(false);
+        
+        // Optionally, you can also call your API to log the invoice sent
+        try {
+          const token = await getToken();
+          await axios.post(`/api/order/${orderId}/send-invoice`, {
+            invoiceSent: true,
+            sentAt: new Date().toISOString(),
+            fileName: pdfFile.name
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } catch (apiError) {
+          // API call failed but email was sent, so we don't show error to user
+          console.error("Failed to log invoice sent:", apiError);
+        }
       } else {
-        toast.error(response.data.message || "Failed to send GST Invoice");
+        toast.error("Failed to send GST Invoice email");
       }
       
     } catch (error) {
       toast.error("Failed to send GST Invoice");
+      console.error("Error sending invoice:", error);
     } finally {
       setSendingInvoice(false);
     }
@@ -110,11 +136,10 @@ const OrderDetails = () => {
               <div className="text-right">
                 <p className="text-sm text-blue-600">Ready for Invoice</p>
                 <button
-                  onClick={sendGSTInvoice}
-                  disabled={sendingInvoice}
-                  className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm"
+                  onClick={() => setShowPDFModal(true)}
+                  className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm"
                 >
-                  {sendingInvoice ? "Sending..." : "Send GST Invoice"}
+                  Send GST Invoice
                 </button>
               </div>
             </div>
@@ -209,6 +234,16 @@ const OrderDetails = () => {
           </div>
         )}
       </div>
+      
+      {/* PDF Upload Modal */}
+      <PDFUploadModal
+        isOpen={showPDFModal}
+        onClose={() => setShowPDFModal(false)}
+        onSend={handleSendGSTInvoice}
+        order={order}
+        loading={sendingInvoice}
+      />
+      
       <Footer />
     </div>
   );
