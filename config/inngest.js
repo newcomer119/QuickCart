@@ -164,42 +164,68 @@ export const createUserOrder = inngest.createFunction(
     }
   },
   { event: "order/created" },
-  async ({ events }) => {
+  async ({ events, step }) => {
     try {
+      console.log('=== INNGEST ORDER PROCESSING START ===');
+      console.log('Function ID: create-user-order');
       console.log('Processing order/created events:', events.length);
       
-      // Since orders are already created in the main API, we'll just log them
-      // and not create duplicates in Inngest
-      const orderSummaries = events.map((event) => {
-        console.log('Order event received:', {
-          customOrderId: event.data.customOrderId,
-          userId: event.data.userId,
-          amount: event.data.amount,
-          subtotal: event.data.subtotal,
-          itemsCount: event.data.items?.length
+      // Log each event in detail
+      events.forEach((event, index) => {
+        console.log(`Event ${index + 1}:`, {
+          eventName: event.name,
+          eventData: event.data,
+          hasCustomOrderId: !!event.data.customOrderId,
+          hasSubtotal: !!event.data.subtotal,
+          customOrderIdValue: event.data.customOrderId,
+          subtotalValue: event.data.subtotal,
+          customOrderIdType: typeof event.data.customOrderId,
+          subtotalType: typeof event.data.subtotal
         });
-        
-        return {
+      });
+      
+      // Create summaries without any database operations
+      const orderSummaries = events.map((event) => {
+        const summary = {
           customOrderId: event.data.customOrderId,
           userId: event.data.userId,
           amount: event.data.amount,
           subtotal: event.data.subtotal,
-          status: 'Processed by Inngest'
+          itemsCount: event.data.items?.length,
+          status: 'Processed by Inngest (Logging Only)',
+          timestamp: new Date().toISOString()
         };
+        
+        console.log('Order summary created:', summary);
+        return summary;
       });
 
-      console.log('Orders processed by Inngest:', orderSummaries.length);
-      console.log('Order summaries:', orderSummaries);
+      console.log('Total orders processed by Inngest:', orderSummaries.length);
+      console.log('All order summaries:', orderSummaries);
+      
+      // Explicitly confirm no database operations
+      console.log('CONFIRMATION: No database operations performed');
+      console.log('CONFIRMATION: No Order.create() calls made');
+      console.log('CONFIRMATION: Only logging and event processing done');
+      console.log('=== INNGEST ORDER PROCESSING END ===');
 
-      // Don't create duplicate orders - just log and process
+      // Return success without any database operations
       return { 
         success: true, 
         processed: orderSummaries.length,
-        message: 'Orders already created in main API, processed by Inngest for logging'
+        message: 'Orders already created in main API, Inngest only logged the events',
+        note: 'No database operations performed by Inngest',
+        functionId: 'create-user-order',
+        timestamp: new Date().toISOString()
       };
       
     } catch (error) {
+      console.error('=== INNGEST ERROR ===');
+      console.error('Function ID: create-user-order');
       console.error('Error in createUserOrder Inngest function:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      console.error('=== INNGEST ERROR END ===');
       throw error;
     }
   }

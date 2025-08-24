@@ -287,22 +287,25 @@ export async function POST(request) {
         user.cartItems = {}
         await user.save()
 
-        await inngest.send({
-            name: "order/created",
-            data: {
-                customOrderId,
-                userId,
-                address,
-                items,
-                amount: totalAmount,
-                subtotal: discountedSubtotal, // Use discountedSubtotal, not subtotal
-                gst: gst,
-                deliveryCharges: deliveryCharges,
-                discount: discountAmount,
-                paymentMethod,
-                date: Date.now()
-            }
-        })
+        // TEMPORARILY DISABLED INNGEST TO TEST
+        // await inngest.send({
+        //     name: "order/created",
+        //     data: {
+        //         customOrderId,
+        //         userId,
+        //         address,
+        //         items,
+        //         amount: totalAmount,
+        //         subtotal: discountedSubtotal, // Use discountedSubtotal, not subtotal
+        //         gst: gst,
+        //         deliveryCharges: deliveryCharges,
+        //         discount: discountAmount,
+        //         paymentMethod,
+        //         date: Date.now()
+        //     }
+        // })
+
+        console.log('Order created successfully, Inngest temporarily disabled');
 
         return NextResponse.json({ 
             success: true, 
