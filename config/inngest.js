@@ -165,30 +165,42 @@ export const createUserOrder = inngest.createFunction(
   },
   { event: "order/created" },
   async ({ events }) => {
-    const orders = events.map((event) => {
-      return {
-        userId: event.data.userId,
-        items: event.data.items.map(item => {
-          const [productId, ...colorParts] = item.product.split('_');
-          return {
-            product: productId,
-            quantity: item.quantity,
-            color: item.color || (colorParts.length > 0 ? colorParts.join('_') : null)
-          };
-        }),
-        amount: event.data.amount,
-        address: event.data.address,
-        paymentMethod: event.data.paymentMethod,
-        paymentStatus: event.data.paymentStatus || 'PENDING',
-        status: event.data.status || 'Order Placed',
-        date: event.data.date,
-        data: event.data // Include the entire data object
-      }
-    })
+    try {
+      console.log('Processing order/created events:', events.length);
+      
+      // Since orders are already created in the main API, we'll just log them
+      // and not create duplicates in Inngest
+      const orderSummaries = events.map((event) => {
+        console.log('Order event received:', {
+          customOrderId: event.data.customOrderId,
+          userId: event.data.userId,
+          amount: event.data.amount,
+          subtotal: event.data.subtotal,
+          itemsCount: event.data.items?.length
+        });
+        
+        return {
+          customOrderId: event.data.customOrderId,
+          userId: event.data.userId,
+          amount: event.data.amount,
+          subtotal: event.data.subtotal,
+          status: 'Processed by Inngest'
+        };
+      });
 
-    await connectDb()
-    await Order.insertMany(orders)
+      console.log('Orders processed by Inngest:', orderSummaries.length);
+      console.log('Order summaries:', orderSummaries);
 
-    return { success: true, processed: orders.length };
+      // Don't create duplicate orders - just log and process
+      return { 
+        success: true, 
+        processed: orderSummaries.length,
+        message: 'Orders already created in main API, processed by Inngest for logging'
+      };
+      
+    } catch (error) {
+      console.error('Error in createUserOrder Inngest function:', error);
+      throw error;
+    }
   }
 )
