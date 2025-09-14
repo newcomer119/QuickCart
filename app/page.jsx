@@ -10,7 +10,6 @@ import Footer from "@/components/Footer";
 import Image from "next/image";
 import { assets } from "@/assets/assets";
 import SearchModal from "@/components/SearchModal";
-import TrackingWidget from "@/components/TrackingWidget";
 
 const Home = () => {
 
@@ -24,9 +23,6 @@ const Home = () => {
         />
         <div className="flex-grow flex justify-center mx-4 max-w-xl">
           <SearchModal />
-        </div>
-        <div className="hidden lg:block">
-          <TrackingWidget className="max-w-xs" />
         </div>
       </div>
       <Navbar/>

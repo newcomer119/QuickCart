@@ -27,9 +27,6 @@ const Navbar = () => {
           <Link href="/contact" className="hover:text-gray-900 transition">
             Contact Us
           </Link>
-          <Link href="/track-order" className="hover:text-gray-900 transition">
-            Track Order
-          </Link>
 
           {isSeller && (
             <button
