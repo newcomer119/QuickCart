@@ -316,6 +316,7 @@ export async function POST(request) {
 
         // Create Shiprocket shipment asynchronously (don't wait for it)
         try {
+            console.log('=== SHIPROCKET CREATION STARTED ===');
             console.log('Creating Shiprocket shipment for order:', order._id);
             
             // Fetch address and user data for Shiprocket
@@ -434,7 +435,9 @@ export async function POST(request) {
             });
             
             console.log('Shiprocket shipment creation initiated for order:', order._id);
+            console.log('=== SHIPROCKET CREATION COMPLETED ===');
         } catch (shipmentError) {
+            console.error('=== SHIPROCKET CREATION FAILED ===');
             console.error('Error initiating Shiprocket shipment:', shipmentError);
             // Don't fail the order if shipment creation fails
         }
