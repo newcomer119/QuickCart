@@ -57,7 +57,7 @@ export async function POST(request) {
         const shipmentData = {
             order_id: order.customOrderId || orderId,
             order_date: new Date(order.date).toISOString().split('T')[0],
-            pickup_location: "Primary", // Shiprocket expects pickup location name/ID as string
+            pickup_location: "warehouse", // Your actual pickup location identifier from Shiprocket
             billing_customer_name: user.name || "Customer",
             billing_last_name: "",
             billing_address: `${address.address}, ${address.city}, ${address.state} ${address.pincode}, India`,
