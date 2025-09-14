@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Loading from '@/components/Loading';
 import OrderTrackingCard from '@/components/OrderTrackingCard';
 
-export default function TrackOrderPage() {
+function TrackOrderContent() {
     const [trackingId, setTrackingId] = useState('');
     const [orderData, setOrderData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -147,5 +147,17 @@ export default function TrackOrderPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function TrackOrderPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <Loading />
+            </div>
+        }>
+            <TrackOrderContent />
+        </Suspense>
     );
 }
