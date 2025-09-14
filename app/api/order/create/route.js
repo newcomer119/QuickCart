@@ -319,16 +319,21 @@ export async function POST(request) {
             console.log('Creating Shiprocket shipment for order:', order._id);
             
             // Fetch address and user data for Shiprocket
+            console.log('Fetching address with ID:', address);
             const addressData = await Address.findById(address);
+            console.log('Address data:', addressData);
+            
+            console.log('Fetching user with ID:', userId);
             const userData = await User.findById(userId);
+            console.log('User data:', userData);
             
             if (!addressData) {
-                console.error('Address not found for order:', order._id);
+                console.error('Address not found for order:', order._id, 'Address ID:', address);
                 return;
             }
             
             if (!userData) {
-                console.error('User not found for order:', order._id);
+                console.error('User not found for order:', order._id, 'User ID:', userId);
                 return;
             }
             
@@ -386,6 +391,7 @@ export async function POST(request) {
             };
 
             // Create shipment (this will run in background)
+            console.log('Calling Shiprocket createShipment API...');
             createShipment(shipmentData).then(shipmentResponse => {
                 console.log('Shiprocket response:', shipmentResponse);
                 

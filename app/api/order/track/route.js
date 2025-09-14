@@ -36,6 +36,19 @@ export async function GET(request) {
             }).populate('address').populate('items.product');
         }
 
+        // Get user information
+        let user = null;
+        if (order && order.userId) {
+            user = await User.findById(order.userId);
+            console.log('User found:', user ? { name: user.name, email: user.email } : 'No user found');
+        }
+        
+        console.log('Order address:', order.address ? {
+            fullName: order.address.fullName,
+            area: order.address.area,
+            phoneNumber: order.address.phoneNumber
+        } : 'No address found');
+
         if (!order) {
             return Response.json({
                 success: false,
@@ -65,19 +78,19 @@ export async function GET(request) {
             
             // Customer details
             customer: {
-                name: order.customerName,
-                email: order.customerEmail,
-                phone: order.customerPhone
+                name: user ? user.name : 'N/A',
+                email: user ? user.email : 'N/A',
+                phone: 'N/A' // User model doesn't have phone field
             },
             
             // Address details
             address: order.address ? {
-                name: order.address.name,
-                address: order.address.address,
+                name: order.address.fullName,
+                address: order.address.area,
                 city: order.address.city,
                 state: order.address.state,
                 pincode: order.address.pincode,
-                phone: order.address.phone
+                phone: order.address.phoneNumber
             } : null,
             
             // Shipment details
