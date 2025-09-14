@@ -97,7 +97,7 @@ const MyOrders = () => {
                       {currency}
                       {order.amount}
                     </p>
-                    <div>
+                    <div className="flex flex-col gap-3">
                       <p className="flex flex-col">
                         <span>Method : {order.paymentMethod}</span>
                         <span>
@@ -105,6 +105,38 @@ const MyOrders = () => {
                         </span>
                         <span>Payment : {order.paymentStatus}</span>
                       </p>
+                      
+                      {/* Tracking Status */}
+                      <div className="flex flex-col gap-2">
+                        <div className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
+                          order.shipmentStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' :
+                          order.shipmentStatus === 'SHIPPED' || order.shipmentStatus === 'IN_TRANSIT' ? 'bg-blue-100 text-blue-800' :
+                          order.shipmentStatus === 'NEW' ? 'bg-green-100 text-green-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {order.shipmentStatus || 'PENDING'}
+                        </div>
+                        
+                        {/* Track Order Button */}
+                        <Link
+                          href={`/track-order?trackingId=${order.customOrderId}`}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors text-center"
+                        >
+                          Track Order
+                        </Link>
+                        
+                        {/* Direct tracking link if available */}
+                        {order.trackingUrl && (
+                          <a
+                            href={order.trackingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-purple-600 text-white px-3 py-1 rounded text-xs hover:bg-purple-700 transition-colors text-center"
+                          >
+                            Shiprocket Tracking
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

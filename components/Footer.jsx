@@ -36,6 +36,23 @@ const Footer = () => {
 
         <div className="w-1/2 flex items-center justify-start md:justify-center">
           <div>
+            <h2 className="font-medium text-gray-900 mb-5">Customer Service</h2>
+            <ul className="text-sm space-y-2">
+              <li>
+                <Link href="/track-order" className="hover:underline transition">Track Your Order</Link>
+              </li>
+              <li>
+                <Link href="/my-orders" className="hover:underline transition">My Orders</Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:underline transition">Contact Support</Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="w-1/2 flex items-center justify-start md:justify-center">
+          <div>
             <h2 className="font-medium text-gray-900 mb-5">Policies</h2>
             <ul className="text-sm space-y-2">
               <li>

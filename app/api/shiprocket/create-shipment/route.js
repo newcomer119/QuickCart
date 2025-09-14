@@ -67,7 +67,7 @@ export async function POST(request) {
             billing_state: address.state,
             billing_country: "India",
             billing_email: user.email,
-            billing_phone: user.phone || "8750461279",
+            billing_phone: user.phone || "8750461279",  
             shipping_is_billing: true,
             order_items: order.items.map(item => ({
                 name: item.product.name,
