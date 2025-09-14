@@ -142,16 +142,16 @@ export async function POST(request) {
         // Create order with appropriate status based on payment method
         let orderData = {
             customOrderId,
-            userId,
-            address,
-            items,
-            amount: totalAmount,
+                userId,
+                address,
+                items,
+                amount: totalAmount,
             subtotal: discountedSubtotal, // Store the discounted subtotal
             gst: gst,
             deliveryCharges: deliveryCharges,
             discount: discountAmount,
-            paymentMethod,
-            date: Date.now(),
+                paymentMethod,
+                date: Date.now(),
             data: { items, address, paymentMethod, couponCode, discount }
         };
 
@@ -432,7 +432,7 @@ export async function POST(request) {
             console.error('Error creating response:', responseError);
             // Fallback response
             return new Response(JSON.stringify({ 
-                success: true, 
+            success: true, 
                 message: paymentMethod === 'ONLINE' ? "Order Placed Successfully" : "Order Placed",
                 order
             }), {

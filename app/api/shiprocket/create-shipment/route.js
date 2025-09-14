@@ -57,19 +57,10 @@ export async function POST(request) {
         const shipmentData = {
             order_id: order.customOrderId || orderId,
             order_date: new Date(order.date).toISOString().split('T')[0],
-            pickup_location: {
-                name: "Filament Freaks",
-                phone: "8750461279",
-                address: "Your Warehouse Address",
-                address_2: "",
-                city: "Dehradun",
-                state: "Uttarakhand",
-                country: "India",
-                pin_code: "248007"
-            },
+            pickup_location: "Primary", // Shiprocket expects pickup location name/ID as string
             billing_customer_name: user.name || "Customer",
             billing_last_name: "",
-            billing_address: address.address,
+            billing_address: `${address.address}, ${address.city}, ${address.state} ${address.pincode}, India`,
             billing_address_2: "",
             billing_city: address.city,
             billing_pincode: address.pincode,
