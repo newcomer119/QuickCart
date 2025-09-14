@@ -93,9 +93,24 @@ export async function POST(request) {
         console.log('Creating Shiprocket shipment for order:', orderId);
         console.log('Shipment data:', JSON.stringify(shipmentData, null, 2));
 
+        // Validate required fields
+        const requiredFields = ['order_id', 'pickup_location', 'billing_customer_name', 'billing_address', 'billing_city', 'billing_pincode', 'billing_state', 'billing_country', 'billing_email', 'billing_phone'];
+        const missingFields = requiredFields.filter(field => !shipmentData[field]);
+        
+        if (missingFields.length > 0) {
+            console.error('Missing required fields:', missingFields);
+            return Response.json({
+                success: false,
+                message: `Missing required fields: ${missingFields.join(', ')}`
+            }, { status: 400 });
+        }
+
         // Create shipment in Shiprocket
         const shipmentResponse = await createShipment(shipmentData);
 
+        console.log('Full Shiprocket response:', JSON.stringify(shipmentResponse, null, 2));
+
+        // Handle different response structures from Shiprocket
         if (shipmentResponse.status === 201 && shipmentResponse.data) {
             const shipment = shipmentResponse.data;
 
@@ -130,7 +145,8 @@ export async function POST(request) {
                 }
             });
         } else {
-            throw new Error(`Shiprocket API error: ${shipmentResponse.message || 'Unknown error'}`);
+            console.error('Shiprocket API returned unexpected response:', shipmentResponse);
+            throw new Error(`Shiprocket API error: ${shipmentResponse.message || shipmentResponse.error || JSON.stringify(shipmentResponse)}`);
         }
 
     } catch (error) {
