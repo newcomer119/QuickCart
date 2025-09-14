@@ -313,6 +313,107 @@ export async function POST(request) {
 
         console.log('Order created successfully and Inngest event sent');
 
+        // Create Shiprocket shipment asynchronously (don't wait for it)
+        try {
+            console.log('Creating Shiprocket shipment for order:', order._id);
+            
+            // Import and call shipment creation (async, non-blocking)
+            const { createShipment } = await import('@/lib/shiprocket');
+            
+            // Prepare order items for shipment
+            const orderItems = [];
+            for (const item of items) {
+                let productId = item.product;
+                if (typeof productId === 'string' && productId.includes('_')) {
+                    productId = productId.split('_')[0];
+                }
+                const product = await Product.findById(productId);
+                if (product) {
+                    orderItems.push({
+                        name: product.name,
+                        sku: product._id.toString(),
+                        units: item.quantity,
+                        selling_price: product.offerPrice,
+                        discount: product.price - product.offerPrice,
+                        tax: Math.floor(product.offerPrice * 0.18),
+                        hsn: "8518", // Default HSN for electronics
+                        product_type: "standard"
+                    });
+                }
+            }
+
+            // Prepare basic shipment data
+            const shipmentData = {
+                order_id: order.customOrderId || order._id.toString(),
+                order_date: new Date(order.date).toISOString().split('T')[0],
+                pickup_location: {
+                    name: "Filament Freaks",
+                    phone: "8750461279",
+                    address: "Your Warehouse Address",
+                    address_2: "",
+                    city: "Dehradun",
+                    state: "Uttarakhand",
+                    country: "India",
+                    pin_code: "248007"
+                },
+                billing_customer_name: user.name || "Customer",
+                billing_last_name: "",
+                billing_address: address.address,
+                billing_address_2: "",
+                billing_city: address.city,
+                billing_pincode: address.pincode,
+                billing_state: address.state,
+                billing_country: "India",
+                billing_email: user.email,
+                billing_phone: user.phone || "8750461279",
+                shipping_is_billing: true,
+                order_items: orderItems,
+                payment_method: paymentMethod === 'COD' ? 'COD' : 'Prepaid',
+                sub_total: subtotal,
+                length: 10,
+                breadth: 10,
+                height: 5,
+                weight: 0.5,
+                shipping_charges: deliveryCharges,
+                total_discount: discount,
+                cod_amount: paymentMethod === 'COD' ? totalAmount : 0
+            };
+
+            // Create shipment (this will run in background)
+            createShipment(shipmentData).then(shipmentResponse => {
+                if (shipmentResponse.status === 201 && shipmentResponse.data) {
+                    const shipment = shipmentResponse.data;
+                    
+                    // Update order with shipment details
+                    Order.findByIdAndUpdate(order._id, {
+                        shiprocketAWB: shipment.awb_code,
+                        shipmentId: shipment.id.toString(),
+                        courierName: shipment.courier_name,
+                        trackingUrl: `https://www.shiprocket.in/tracking/${shipment.awb_code}`,
+                        shipmentStatus: 'PENDING',
+                        pickupScheduledDate: shipment.pickup_scheduled_date ? new Date(shipment.pickup_scheduled_date) : null,
+                        expectedDeliveryDate: shipment.expected_delivery_date ? new Date(shipment.expected_delivery_date) : null
+                    }).then(() => {
+                        console.log('Shiprocket shipment created and order updated:', {
+                            orderId: order._id,
+                            awb: shipment.awb_code,
+                            courier: shipment.courier_name
+                        });
+                    }).catch(updateError => {
+                        console.error('Error updating order with shipment details:', updateError);
+                    });
+                }
+            }).catch(shipmentError => {
+                console.error('Error creating Shiprocket shipment:', shipmentError);
+                // Don't fail the order if shipment creation fails
+            });
+            
+            console.log('Shiprocket shipment creation initiated for order:', order._id);
+        } catch (shipmentError) {
+            console.error('Error initiating Shiprocket shipment:', shipmentError);
+            // Don't fail the order if shipment creation fails
+        }
+
         // Debug NextResponse
         console.log('NextResponse available:', !!NextResponse);
         console.log('NextResponse type:', typeof NextResponse);
