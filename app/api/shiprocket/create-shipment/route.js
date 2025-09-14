@@ -111,43 +111,54 @@ export async function POST(request) {
         console.log('Full Shiprocket response:', JSON.stringify(shipmentResponse, null, 2));
 
         // Handle different response structures from Shiprocket
-        if (shipmentResponse.status === 201 && shipmentResponse.data) {
-            const shipment = shipmentResponse.data;
-
-            // Update order with Shiprocket details
-            await Order.findByIdAndUpdate(orderId, {
-                shiprocketAWB: shipment.awb_code,
-                shipmentId: shipment.id.toString(),
-                courierName: shipment.courier_name,
-                trackingUrl: `https://www.shiprocket.in/tracking/${shipment.awb_code}`,
-                shipmentStatus: 'PENDING',
-                pickupScheduledDate: shipment.pickup_scheduled_date ? new Date(shipment.pickup_scheduled_date) : null,
-                expectedDeliveryDate: shipment.expected_delivery_date ? new Date(shipment.expected_delivery_date) : null
-            });
-
-            console.log('Shipment created successfully:', {
-                orderId,
-                awb: shipment.awb_code,
-                courier: shipment.courier_name,
-                trackingUrl: `https://www.shiprocket.in/tracking/${shipment.awb_code}`
-            });
-
-            return Response.json({
-                success: true,
-                message: 'Shipment created successfully',
-                data: {
-                    awb: shipment.awb_code,
-                    courier: shipment.courier_name,
-                    trackingUrl: `https://www.shiprocket.in/tracking/${shipment.awb_code}`,
-                    status: shipment.status,
-                    pickupDate: shipment.pickup_scheduled_date,
-                    expectedDelivery: shipment.expected_delivery_date
-                }
-            });
+        // Check if response has shipment_id (successful creation) or if it's wrapped in status/data
+        let shipment;
+        if (shipmentResponse.shipment_id) {
+            // Direct response format (what we're getting)
+            shipment = shipmentResponse;
+        } else if (shipmentResponse.status === 201 && shipmentResponse.data) {
+            // Wrapped response format
+            shipment = shipmentResponse.data;
         } else {
             console.error('Shiprocket API returned unexpected response:', shipmentResponse);
             throw new Error(`Shiprocket API error: ${shipmentResponse.message || shipmentResponse.error || JSON.stringify(shipmentResponse)}`);
         }
+
+        // Update order with Shiprocket details
+        await Order.findByIdAndUpdate(orderId, {
+            shiprocketAWB: shipment.awb_code || '',
+            shipmentId: shipment.shipment_id ? shipment.shipment_id.toString() : '',
+            courierName: shipment.courier_name || '',
+            trackingUrl: shipment.awb_code ? `https://www.shiprocket.in/tracking/${shipment.awb_code}` : '',
+            shipmentStatus: shipment.status || 'NEW',
+            pickupScheduledDate: shipment.pickup_scheduled_date ? new Date(shipment.pickup_scheduled_date) : null,
+            expectedDeliveryDate: shipment.expected_delivery_date ? new Date(shipment.expected_delivery_date) : null
+        });
+
+        console.log('Shipment created successfully:', {
+            orderId,
+            shiprocketOrderId: shipment.order_id,
+            shipmentId: shipment.shipment_id,
+            channelOrderId: shipment.channel_order_id,
+            status: shipment.status,
+            awb: shipment.awb_code
+        });
+
+        return Response.json({
+            success: true,
+            message: 'Shipment created successfully',
+            data: {
+                shiprocketOrderId: shipment.order_id,
+                shipmentId: shipment.shipment_id,
+                channelOrderId: shipment.channel_order_id,
+                status: shipment.status,
+                awb: shipment.awb_code || '',
+                courier: shipment.courier_name || '',
+                trackingUrl: shipment.awb_code ? `https://www.shiprocket.in/tracking/${shipment.awb_code}` : '',
+                pickupDate: shipment.pickup_scheduled_date,
+                expectedDelivery: shipment.expected_delivery_date
+            }
+        });
 
     } catch (error) {
         console.error('Error creating shipment:', error);
