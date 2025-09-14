@@ -21,9 +21,11 @@ export async function POST() {
         let testUser = await User.findOne({ email: 'test@example.com' });
         if (!testUser) {
             testUser = await User.create({
+                _id: `test-user-${Date.now()}`,
                 name: 'Test Customer',
                 email: 'test@example.com',
-                phone: '9876543210'
+                imageUrl: 'https://example.com/test-avatar.jpg',
+                cartItems: {}
             });
         }
         
