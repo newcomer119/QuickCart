@@ -1,6 +1,7 @@
 import { inngest } from "@/config/inngest";
 import Product from "@/models/Product";
 import User from "@/models/Users";
+import Address from "@/models/Address";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import connectDb from "@/config/db";
@@ -317,6 +318,20 @@ export async function POST(request) {
         try {
             console.log('Creating Shiprocket shipment for order:', order._id);
             
+            // Fetch address and user data for Shiprocket
+            const addressData = await Address.findById(address);
+            const userData = await User.findById(userId);
+            
+            if (!addressData) {
+                console.error('Address not found for order:', order._id);
+                return;
+            }
+            
+            if (!userData) {
+                console.error('User not found for order:', order._id);
+                return;
+            }
+            
             // Import and call shipment creation (async, non-blocking)
             const { createShipment } = await import('@/lib/shiprocket');
             
@@ -347,16 +362,16 @@ export async function POST(request) {
                 order_id: order.customOrderId || order._id.toString(),
                 order_date: new Date(order.date).toISOString().split('T')[0],
                 pickup_location: "warehouse", // Your actual pickup location identifier from Shiprocket
-                billing_customer_name: address.fullName || user.name || "Customer",
+                billing_customer_name: addressData.fullName || userData.name || "Customer",
                 billing_last_name: "",
-                billing_address: `${address.area}, ${address.city}, ${address.state} ${address.pincode}, India`,
+                billing_address: `${addressData.area}, ${addressData.city}, ${addressData.state} ${addressData.pincode}, India`,
                 billing_address_2: "",
-                billing_city: address.city,
-                billing_pincode: address.pincode,
-                billing_state: address.state,
+                billing_city: addressData.city,
+                billing_pincode: addressData.pincode,
+                billing_state: addressData.state,
                 billing_country: "India",
-                billing_email: user.email,
-                billing_phone: address.phoneNumber || user.phone || "8750461279",
+                billing_email: userData.email,
+                billing_phone: addressData.phoneNumber || userData.phone || "8750461279",
                 shipping_is_billing: true,
                 order_items: orderItems,
                 payment_method: paymentMethod === 'COD' ? 'COD' : 'Prepaid',
