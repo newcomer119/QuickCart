@@ -21,7 +21,15 @@ const orderSchema = new mongoose.Schema({
     razorpayOrderId : {type : String},
     razorpayPaymentId : {type : String},
     data : {type : Object, required: true},
-    date : {type : Number, required: true}
+    date : {type : Number, required: true},
+    // Shiprocket fields
+    shiprocketAWB: {type: String, required: false}, // AWB tracking number
+    shipmentId: {type: String, required: false}, // Shiprocket shipment ID
+    courierName: {type: String, required: false}, // Courier partner name
+    trackingUrl: {type: String, required: false}, // Tracking URL
+    shipmentStatus: {type: String, required: false, default: 'PENDING'}, // Shipment status from Shiprocket
+    pickupScheduledDate: {type: Date, required: false}, // When pickup is scheduled
+    expectedDeliveryDate: {type: Date, required: false} // Expected delivery date
 })
 
 // Ensure the model is properly registered
