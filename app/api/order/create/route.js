@@ -346,26 +346,17 @@ export async function POST(request) {
             const shipmentData = {
                 order_id: order.customOrderId || order._id.toString(),
                 order_date: new Date(order.date).toISOString().split('T')[0],
-                pickup_location: {
-                    name: "Filament Freaks",
-                    phone: "8750461279",
-                    address: "Your Warehouse Address",
-                    address_2: "",
-                    city: "Dehradun",
-                    state: "Uttarakhand",
-                    country: "India",
-                    pin_code: "248007"
-                },
-                billing_customer_name: user.name || "Customer",
+                pickup_location: "warehouse", // Your actual pickup location identifier from Shiprocket
+                billing_customer_name: address.fullName || user.name || "Customer",
                 billing_last_name: "",
-                billing_address: address.address,
+                billing_address: `${address.area}, ${address.city}, ${address.state} ${address.pincode}, India`,
                 billing_address_2: "",
                 billing_city: address.city,
                 billing_pincode: address.pincode,
                 billing_state: address.state,
                 billing_country: "India",
                 billing_email: user.email,
-                billing_phone: user.phone || "8750461279",
+                billing_phone: address.phoneNumber || user.phone || "8750461279",
                 shipping_is_billing: true,
                 order_items: orderItems,
                 payment_method: paymentMethod === 'COD' ? 'COD' : 'Prepaid',
@@ -381,28 +372,41 @@ export async function POST(request) {
 
             // Create shipment (this will run in background)
             createShipment(shipmentData).then(shipmentResponse => {
-                if (shipmentResponse.status === 201 && shipmentResponse.data) {
-                    const shipment = shipmentResponse.data;
-                    
-                    // Update order with shipment details
-                    Order.findByIdAndUpdate(order._id, {
-                        shiprocketAWB: shipment.awb_code,
-                        shipmentId: shipment.id.toString(),
-                        courierName: shipment.courier_name,
-                        trackingUrl: `https://www.shiprocket.in/tracking/${shipment.awb_code}`,
-                        shipmentStatus: 'PENDING',
-                        pickupScheduledDate: shipment.pickup_scheduled_date ? new Date(shipment.pickup_scheduled_date) : null,
-                        expectedDeliveryDate: shipment.expected_delivery_date ? new Date(shipment.expected_delivery_date) : null
-                    }).then(() => {
-                        console.log('Shiprocket shipment created and order updated:', {
-                            orderId: order._id,
-                            awb: shipment.awb_code,
-                            courier: shipment.courier_name
-                        });
-                    }).catch(updateError => {
-                        console.error('Error updating order with shipment details:', updateError);
-                    });
+                console.log('Shiprocket response:', shipmentResponse);
+                
+                // Handle different response structures from Shiprocket
+                let shipment;
+                if (shipmentResponse.shipment_id) {
+                    // Direct response format (what we're getting)
+                    shipment = shipmentResponse;
+                } else if (shipmentResponse.status === 201 && shipmentResponse.data) {
+                    // Wrapped response format
+                    shipment = shipmentResponse.data;
+                } else {
+                    console.error('Unexpected Shiprocket response format:', shipmentResponse);
+                    return;
                 }
+                
+                // Update order with shipment details
+                Order.findByIdAndUpdate(order._id, {
+                    shiprocketAWB: shipment.awb_code || '',
+                    shipmentId: shipment.shipment_id ? shipment.shipment_id.toString() : '',
+                    courierName: shipment.courier_name || '',
+                    trackingUrl: shipment.awb_code ? `https://www.shiprocket.in/tracking/${shipment.awb_code}` : '',
+                    shipmentStatus: shipment.status || 'NEW',
+                    pickupScheduledDate: shipment.pickup_scheduled_date ? new Date(shipment.pickup_scheduled_date) : null,
+                    expectedDeliveryDate: shipment.expected_delivery_date ? new Date(shipment.expected_delivery_date) : null
+                }).then(() => {
+                    console.log('Shiprocket shipment created and order updated:', {
+                        orderId: order._id,
+                        shiprocketOrderId: shipment.order_id,
+                        shipmentId: shipment.shipment_id,
+                        status: shipment.status,
+                        awb: shipment.awb_code
+                    });
+                }).catch(updateError => {
+                    console.error('Error updating order with shipment details:', updateError);
+                });
             }).catch(shipmentError => {
                 console.error('Error creating Shiprocket shipment:', shipmentError);
                 // Don't fail the order if shipment creation fails
