@@ -4,6 +4,7 @@
  */
 
 import Order from '@/models/Order';
+import User from '@/models/Users';
 import { trackShipment } from '@/lib/shiprocket';
 import connectDb from '@/config/db';
 
