@@ -7,7 +7,7 @@ const HomeProducts = () => {
 
   const handleSeeMore = () => {
     setIsLoading(true);
-    router.push("/all-products");
+    router.push("/3d-printed-products");
   };
 
   return (

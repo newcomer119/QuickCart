@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { assets, BagIcon, BoxIcon, CartIcon, HomeIcon } from "@/assets/assets";
 import Link from "next/link";
 import { useAppContext } from "@/context/AppContext";
@@ -9,6 +9,7 @@ import { useClerk, UserButton, useUser } from "@clerk/nextjs";
 const Navbar = () => {
   const { isSeller, router, user } = useAppContext();
   const { openSignIn } = useClerk();
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
 
   return (
     <>
@@ -18,12 +19,38 @@ const Navbar = () => {
           <Link href="/" className="hover:text-gray-900 transition">
             Home
           </Link>
-          <Link href="/all-products" className="hover:text-gray-900 transition">
-            Shop
-          </Link>
-          <Link href="/organic-products" className="hover:text-gray-900 transition">
-            Shop by Organic
-          </Link>
+          <div className="relative">
+            <button
+              className="hover:text-gray-900 transition flex items-center gap-1"
+              onMouseEnter={() => setIsShopDropdownOpen(true)}
+              onMouseLeave={() => setIsShopDropdownOpen(false)}
+            >
+              Shop
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {isShopDropdownOpen && (
+              <div
+                className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+                onMouseEnter={() => setIsShopDropdownOpen(true)}
+                onMouseLeave={() => setIsShopDropdownOpen(false)}
+              >
+                <Link
+                  href="/3d-printed-products"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                >
+                  3D Printed Products
+                </Link>
+                <Link
+                  href="/organic-products"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                >
+                  Shop by Organic
+                </Link>
+              </div>
+            )}
+          </div>
           <Link href="/policies" className="hover:text-gray-900 transition">
             Policies
           </Link>
@@ -95,9 +122,9 @@ const Navbar = () => {
                 </UserButton.MenuItems>
                 <UserButton.MenuItems>
                   <UserButton.Action
-                    label="Products"
+                    label="3D Printed Products"
                     labelIcon={<BoxIcon />}
-                    onClick={() => router.push("/all-products")}
+                    onClick={() => router.push("/3d-printed-products")}
                   />
                 </UserButton.MenuItems>
                 <UserButton.MenuItems>
