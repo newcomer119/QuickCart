@@ -218,6 +218,7 @@ const EditProduct = () => {
                             <option value="Laptop">Laptop</option>
                             <option value="Camera">Camera</option>
                             <option value="Accessories">Accessories</option>
+                            <option value="Organics by Filament Freaks">Organics by Filament Freaks</option>
                         </select>
                     </div>
                     <div className="flex flex-col gap-1 w-32">

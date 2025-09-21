@@ -21,6 +21,9 @@ const Navbar = () => {
           <Link href="/all-products" className="hover:text-gray-900 transition">
             Shop
           </Link>
+          <Link href="/organic-products" className="hover:text-gray-900 transition">
+            Shop by Organic
+          </Link>
           <Link href="/policies" className="hover:text-gray-900 transition">
             Policies
           </Link>
@@ -94,7 +97,14 @@ const Navbar = () => {
                   <UserButton.Action
                     label="Products"
                     labelIcon={<BoxIcon />}
-                    onClick={() => router.push("/products")}
+                    onClick={() => router.push("/all-products")}
+                  />
+                </UserButton.MenuItems>
+                <UserButton.MenuItems>
+                  <UserButton.Action
+                    label="Organic Products"
+                    labelIcon={<BoxIcon />}
+                    onClick={() => router.push("/organic-products")}
                   />
                 </UserButton.MenuItems>
                 <UserButton.MenuItems>
