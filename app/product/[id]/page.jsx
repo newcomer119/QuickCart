@@ -82,7 +82,10 @@ const Product = () => {
       (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
     );
     if (hasMultipleColors && !selectedColor) {
-      toast.error("Please select a color");
+      const message = productData.category === "Organics by Filament Freaks" 
+        ? "Please select a fragrance" 
+        : "Please select a color";
+      toast.error(message);
       return;
     }
     addToCart(productData._id, selectedColor, selectedColorImage);
@@ -99,7 +102,10 @@ const Product = () => {
       (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
     );
     if (hasMultipleColors && !selectedColor) {
-      toast.error("Please select a color");
+      const message = productData.category === "Organics by Filament Freaks" 
+        ? "Please select a fragrance" 
+        : "Please select a color";
+      toast.error(message);
       return;
     }
     const cartKey = selectedColor ? `${productData._id}_${selectedColor}` : productData._id;
@@ -241,53 +247,55 @@ const Product = () => {
             </p>
             <hr className="bg-gray-600 my-6" />
             
-            {/* Color Selection */}
+            {/* Color/Fragrance Selection */}
             {productData.colors && productData.colors.length > 0 ? (
               <div className="mb-6">
-                <p className="text-base font-medium mb-3">Select Color:</p>
+                <p className="text-base font-medium mb-3">
+                  {productData.category === "Organics by Filament Freaks" ? "Select Fragrance:" : "Select Color:"}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {Array.isArray(productData.colors) ? (
-                    productData.colors.map((color) => (
+                    productData.colors.map((item) => (
                       <button
-                        key={color}
+                        key={item}
                         type="button"
-                        onClick={() => handleColorSelect(color)}
+                        onClick={() => handleColorSelect(item)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                          selectedColor === color
+                          selectedColor === item
                             ? 'bg-orange-500 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         } flex items-center gap-2`}
                       >
-                        {productData.colorImages && productData.colorImages[color] && (
+                        {productData.colorImages && productData.colorImages[item] && (
                           <img
-                            src={productData.colorImages[color]}
-                            alt={color}
+                            src={productData.colorImages[item]}
+                            alt={item}
                             className="w-6 h-6 rounded-full border border-gray-300"
                           />
                         )}
-                        {color}
+                        {item}
                       </button>
                     ))
                   ) : (
-                    productData.colors.split(/(?=[A-Z])/).map((color) => (
+                    productData.colors.split(/(?=[A-Z])/).map((item) => (
                       <button
-                        key={color}
+                        key={item}
                         type="button"
-                        onClick={() => handleColorSelect(color)}
+                        onClick={() => handleColorSelect(item)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                          selectedColor === color
+                          selectedColor === item
                             ? 'bg-orange-500 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         } flex items-center gap-2`}
                       >
-                        {productData.colorImages && productData.colorImages[color] && (
+                        {productData.colorImages && productData.colorImages[item] && (
                           <img
-                            src={productData.colorImages[color]}
-                            alt={color}
+                            src={productData.colorImages[item]}
+                            alt={item}
                             className="w-6 h-6 rounded-full border border-gray-300"
                           />
                         )}
-                        {color}
+                        {item}
                       </button>
                     ))
                   )}
@@ -311,8 +319,12 @@ const Product = () => {
               </div>
             ) : (
               <div className="mb-6">
-                <p className="text-base font-medium mb-3">Color:</p>
-                <p className="text-gray-600">No different colors</p>
+                <p className="text-base font-medium mb-3">
+                  {productData.category === "Organics by Filament Freaks" ? "Fragrance:" : "Color:"}
+                </p>
+                <p className="text-gray-600">
+                  {productData.category === "Organics by Filament Freaks" ? "No different fragrances" : "No different colors"}
+                </p>
               </div>
             )}
             {/* Debug info - remove this later */}
@@ -324,20 +336,22 @@ const Product = () => {
                     <td className="text-gray-800/50 ">Filament Freaks</td>
                   </tr>
                   <tr>
-                    <td className="text-gray-600 font-medium">Color</td>
+                    <td className="text-gray-600 font-medium">
+                      {productData.category === "Organics by Filament Freaks" ? "Fragrance" : "Color"}
+                    </td>
                     <td className="text-gray-800/50 ">
                       {productData.colors && productData.colors.length > 0 ? (
                         Array.isArray(productData.colors) 
                           ? (productData.colors.length > 1 
-                              ? `${productData.colors.length} colors available`
+                              ? `${productData.colors.length} ${productData.category === "Organics by Filament Freaks" ? "fragrances" : "colors"} available`
                               : productData.colors[0]
                             )
                           : (productData.colors.split(/(?=[A-Z])/).length > 1
-                              ? `${productData.colors.split(/(?=[A-Z])/).length} colors available`
+                              ? `${productData.colors.split(/(?=[A-Z])/).length} ${productData.category === "Organics by Filament Freaks" ? "fragrances" : "colors"} available`
                               : productData.colors
                             )
                       ) : (
-                        "No different colors"
+                        productData.category === "Organics by Filament Freaks" ? "No different fragrances" : "No different colors"
                       )}
                     </td>
                   </tr>

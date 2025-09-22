@@ -35,6 +35,18 @@ const EditProduct = () => {
         'Cool( lithopane ) white'
     ];
 
+    const availableFragrances = [
+        'JASMINE',
+        'ASHTAGANDHA',
+        'KESAR CHANDAN',
+        'LAVENDER',
+        'MOGRA',
+        'GULAB',
+        'LOBHAN',
+        'KAPOOR',
+        'GUGAL'
+    ];
+
     useEffect(() => {
         const fetchProductData = async () => {
             if (!id) return;
@@ -232,34 +244,36 @@ const EditProduct = () => {
                 </div>
 
                 <div className="flex flex-col gap-1 max-w-md">
-                    <label className="text-base font-medium">Available Colors</label>
+                    <label className="text-base font-medium">
+                        {category === "Organics by Filament Freaks" ? "Available Fragrances" : "Available Colors"}
+                    </label>
                     <div className="flex flex-wrap gap-3 mt-2">
-                        {availableColors.map((color) => (
-                            <div key={color} className="flex flex-col items-start">
+                        {(category === "Organics by Filament Freaks" ? availableFragrances : availableColors).map((item) => (
+                            <div key={item} className="flex flex-col items-start">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        checked={selectedColorImages.hasOwnProperty(color)}
-                                        onChange={() => handleColorChange(color)}
+                                        checked={selectedColorImages.hasOwnProperty(item)}
+                                        onChange={() => handleColorChange(item)}
                                         className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
                                     />
-                                    <span className="text-sm">{color}</span>
+                                    <span className="text-sm">{item}</span>
                                 </label>
-                                {selectedColorImages.hasOwnProperty(color) && (
+                                {selectedColorImages.hasOwnProperty(item) && (
                                     <div className="mt-1">
                                         <input
                                             type="file"
                                             accept="image/*"
-                                            onChange={e => handleColorImageChange(e, color)}
+                                            onChange={e => handleColorImageChange(e, item)}
                                         />
-                                        {(selectedColorImages[color] || existingColorImages[color]) && (
+                                        {(selectedColorImages[item] || existingColorImages[item]) && (
                                             <img
                                                 src={
-                                                    selectedColorImages[color] instanceof File
-                                                        ? URL.createObjectURL(selectedColorImages[color])
-                                                        : existingColorImages[color]
+                                                    selectedColorImages[item] instanceof File
+                                                        ? URL.createObjectURL(selectedColorImages[item])
+                                                        : existingColorImages[item]
                                                 }
-                                                alt={`${color} preview`}
+                                                alt={`${item} preview`}
                                                 className="w-16 h-16 object-cover mt-1"
                                             />
                                         )}

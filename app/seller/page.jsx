@@ -54,6 +54,18 @@ const AddProduct = () => {
     'Cool( lithopane ) white'
   ];
 
+  const availableFragrances = [
+    'JASMINE',
+    'ASHTAGANDHA',
+    'KESAR CHANDAN',
+    'LAVENDER',
+    'MOGRA',
+    'GULAB',
+    'LOBHAN',
+    'KAPOOR',
+    'GUGAL'
+  ];
+
   const handleColorChange = (color) => {
     setSelectedColorImages(prev => {
       if (prev[color] !== undefined) {
@@ -77,16 +89,22 @@ const AddProduct = () => {
       return;
     }
 
-    // Check if at least one color is selected
+    // Check if at least one color/fragrance is selected
     if (Object.keys(selectedColorImages).length === 0) {
-      toast.error("Please select at least one color");
+      const message = category === "Organics by Filament Freaks" 
+        ? "Please select at least one fragrance" 
+        : "Please select at least one color";
+      toast.error(message);
       return;
     }
 
-    // Check if every selected color has an image
-    const missingImage = Object.entries(selectedColorImages).some(([color, file]) => !file);
+    // Check if every selected color/fragrance has an image
+    const missingImage = Object.entries(selectedColorImages).some(([item, file]) => !file);
     if (missingImage) {
-      toast.error("Please upload an image for each selected color");
+      const message = category === "Organics by Filament Freaks" 
+        ? "Please upload an image for each selected fragrance" 
+        : "Please upload an image for each selected color";
+      toast.error(message);
       return;
     }
 
@@ -280,24 +298,24 @@ const AddProduct = () => {
           </div>
         </div>
 
-        {/* Color Selection */}
+        {/* Color/Fragrance Selection */}
         <div className="flex flex-col gap-1 max-w-md">
           <label className="text-base font-medium">
-            Available Colors
+            {category === "Organics by Filament Freaks" ? "Available Fragrances" : "Available Colors"}
           </label>
           <div className="flex flex-wrap gap-3 mt-2">
-            {availableColors.map((color) => (
-              <div key={color} className="flex flex-col items-start">
+            {(category === "Organics by Filament Freaks" ? availableFragrances : availableColors).map((item) => (
+              <div key={item} className="flex flex-col items-start">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={selectedColorImages[color] !== undefined}
-                    onChange={() => handleColorChange(color)}
+                    checked={selectedColorImages[item] !== undefined}
+                    onChange={() => handleColorChange(item)}
                     className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
                   />
-                  <span className="text-sm">{color}</span>
+                  <span className="text-sm">{item}</span>
                 </label>
-                {selectedColorImages[color] !== undefined && (
+                {selectedColorImages[item] !== undefined && (
                   <div className="mt-1">
                     <input
                       type="file"
@@ -306,14 +324,14 @@ const AddProduct = () => {
                         const file = e.target.files[0];
                         setSelectedColorImages(prev => ({
                           ...prev,
-                          [color]: file || null
+                          [item]: file || null
                         }));
                       }}
                     />
-                    {selectedColorImages[color] && (
+                    {selectedColorImages[item] && (
                       <img
-                        src={URL.createObjectURL(selectedColorImages[color])}
-                        alt={`${color} preview`}
+                        src={URL.createObjectURL(selectedColorImages[item])}
+                        alt={`${item} preview`}
                         className="w-16 h-16 object-cover mt-1"
                       />
                     )}
