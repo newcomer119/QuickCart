@@ -63,10 +63,32 @@ export async function POST(request) {
             throw new Error('Invalid subtotal calculation - subtotal is not a number');
         }
 
-        // Calculate payment breakdown
+        // Calculate payment breakdown with category-wise GST (5% for Organic, 18% for others)
         const discountAmount = discount || 0;
         const discountedSubtotal = subtotal - discountAmount; // Apply discount to subtotal first
-        const gst = Math.floor(discountedSubtotal * 0.18); // Calculate GST on discounted amount
+
+        // Compute category split on gross subtotal
+        let organicGross = 0;
+        let otherGross = 0;
+        for (const item of items) {
+            let productId = item.product;
+            if (typeof productId === 'string' && productId.includes('_')) {
+                productId = productId.split('_')[0];
+            }
+            const product = await Product.findById(productId);
+            if (!product) continue;
+            const lineTotal = (product.offerPrice || 0) * item.quantity;
+            if (product.category === "Organics by Filament Freaks") {
+                organicGross += lineTotal;
+            } else {
+                otherGross += lineTotal;
+            }
+        }
+        const totalGross = organicGross + otherGross || 1; // avoid divide-by-zero
+        const organicPortion = (organicGross / totalGross) * discountedSubtotal;
+        const otherPortion = discountedSubtotal - organicPortion;
+        const gst = Math.floor(organicPortion * 0.05 + otherPortion * 0.18);
+
         const deliveryCharges = 0; // Free delivery for now
         const totalAmount = discountedSubtotal + gst + deliveryCharges; // Total = discounted subtotal + GST + delivery
 

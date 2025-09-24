@@ -17,6 +17,7 @@ const OrderSummary = () => {
     cart,
     setCartItems,
     cartItems,
+    products,
   } = useAppContext();
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -92,12 +93,46 @@ const OrderSummary = () => {
     return 0;
   };
 
+  // Compute GST with 5% for Organic products and 18% for others, proportionally after discount
+  const computeGst = () => {
+    const subtotal = getCartAmount();
+    const discount = calculateDiscount();
+    const discountedSubtotal = subtotal - discount;
+
+    if (subtotal <= 0 || discountedSubtotal <= 0) return 0;
+
+    let organicGross = 0;
+    let otherGross = 0;
+
+    for (const key in cartItems) {
+      const cartItem = cartItems[key];
+      if (!cartItem || cartItem.quantity <= 0) continue;
+      const productId = key.split('_')[0];
+      const product = products.find(p => p._id === productId);
+      if (!product) continue;
+      const lineTotal = (product.offerPrice || 0) * cartItem.quantity;
+      if (product.category === "Organics by Filament Freaks") {
+        organicGross += lineTotal;
+      } else {
+        otherGross += lineTotal;
+      }
+    }
+
+    const totalGross = organicGross + otherGross;
+    if (totalGross <= 0) return 0;
+
+    const organicPortion = (organicGross / totalGross) * discountedSubtotal;
+    const otherPortion = discountedSubtotal - organicPortion;
+
+    return Math.floor(organicPortion * 0.05 + otherPortion * 0.18);
+  };
+
   const getFinalAmount = () => {
     const subtotal = getCartAmount();
     const discount = calculateDiscount();
-    const discountedSubtotal = subtotal - discount; // Apply discount to subtotal first
-    const gst = Math.floor(discountedSubtotal * 0.18); // Calculate GST on discounted amount
-    return discountedSubtotal + gst; // Return discounted subtotal + GST
+    const discountedSubtotal = subtotal - discount;
+    const gst = computeGst();
+    return discountedSubtotal + gst;
   };
 
   const createOrderAfterPayment = async (paymentData) => {
@@ -416,10 +451,10 @@ const OrderSummary = () => {
           )}
           
           <div className="flex justify-between">
-            <p className="text-gray-600">GST (18%)</p>
+            <p className="text-gray-600">GST</p>
             <p className="font-medium text-gray-800">
               {currency}
-              {Math.floor((getCartAmount() - calculateDiscount()) * 0.18)}
+              {computeGst()}
             </p>
           </div>
           
