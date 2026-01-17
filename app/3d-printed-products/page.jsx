@@ -18,10 +18,76 @@ const ThreeDPrintedProducts = () => {
         return () => clearTimeout(timeout);
     }, [setIsLoading]);
 
-    // Filter products to show only 3D printed products (Accessories)
-    const threeDPrintedProducts = products.filter(product => 
-        product.category === "Accessories"
-    );
+    // Allowed colors: black, forest green, magenta, lavender
+    const allowedColors = ['black', 'forest green', 'magenta', 'lavender'];
+    
+    // Helper function to normalize color names for matching
+    const normalizeColor = (color) => {
+        if (!color) return '';
+        const normalized = color.toLowerCase().trim();
+        // Handle variations
+        if (normalized.includes('black')) return 'black';
+        if (normalized.includes('forest') && normalized.includes('green')) return 'forest green';
+        if (normalized.includes('magenta')) return 'magenta';
+        if (normalized.includes('lavender') || normalized.includes('violet')) return 'lavender';
+        return normalized;
+    };
+    
+    // Helper function to check if a color is allowed
+    const isAllowedColor = (color) => {
+        const normalized = normalizeColor(color);
+        return allowedColors.includes(normalized);
+    };
+    
+    // Filter and modify products
+    const threeDPrintedProducts = products
+        .filter(product => {
+            // First check if material contains PLA
+            const searchText = [
+                product.additionalInfo || '',
+                product.description || '',
+                product.name || ''
+            ].join(' ').toLowerCase();
+            
+            if (!searchText.includes('pla')) {
+                return false;
+            }
+            
+            // Then check if product has at least one allowed color
+            if (!product.colors || (Array.isArray(product.colors) && product.colors.length === 0)) {
+                return false;
+            }
+            
+            const colors = Array.isArray(product.colors) 
+                ? product.colors 
+                : product.colors.split(/(?=[A-Z])/);
+            
+            return colors.some(color => isAllowedColor(color));
+        })
+        .map(product => {
+            // Filter out non-allowed colors from the product
+            const colors = Array.isArray(product.colors) 
+                ? product.colors 
+                : product.colors.split(/(?=[A-Z])/);
+            
+            const filteredColors = colors.filter(color => isAllowedColor(color));
+            
+            // Filter colorImages to only include allowed colors
+            const filteredColorImages = {};
+            if (product.colorImages) {
+                filteredColors.forEach(color => {
+                    if (product.colorImages[color]) {
+                        filteredColorImages[color] = product.colorImages[color];
+                    }
+                });
+            }
+            
+            return {
+                ...product,
+                colors: filteredColors,
+                colorImages: Object.keys(filteredColorImages).length > 0 ? filteredColorImages : product.colorImages
+            };
+        });
 
     return (
         <>
