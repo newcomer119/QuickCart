@@ -21,7 +21,10 @@ const ExploreCollection = () => {
   });
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const availableColors = [
+  // Allowed colors: black, forest green, magenta, lavender
+  const allowedColors = ['Pitch black', 'Forest green', 'Magenta', 'Levender violet'];
+  
+  const allColors = [
     'Pitch black',
     'Pure white', 
     'Lemon yellow',
@@ -57,6 +60,11 @@ const ExploreCollection = () => {
     'Thanos purple',
     'Cool( lithopane ) white'
   ];
+  
+  // Helper function to check if color is allowed
+  const isColorAllowed = (color) => {
+    return allowedColors.includes(color);
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -104,6 +112,12 @@ const ExploreCollection = () => {
 
     if (!formData.designName.trim()) {
       toast.error("Please enter a design name");
+      return;
+    }
+
+    // Validate that selected color is allowed
+    if (!isColorAllowed(formData.color)) {
+      toast.error("Please select an available color. Only black, forest green, magenta, and lavender are in stock.");
       return;
     }
 
@@ -273,10 +287,6 @@ const ExploreCollection = () => {
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="PLA">PLA (Standard)</option>
-                      <option value="ABS">ABS (Durable)</option>
-                      <option value="PETG">PETG (Strong & Flexible)</option>
-                      <option value="TPU">TPU (Flexible)</option>
-                      <option value="Resin">Resin (High Detail)</option>
                     </select>
                   </div>
 
@@ -290,10 +300,23 @@ const ExploreCollection = () => {
                       onChange={handleInputChange}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
-                      {availableColors.map((color) => (
-                        <option key={color} value={color}>{color}</option>
-                      ))}
+                      {allColors.map((color) => {
+                        const isAllowed = isColorAllowed(color);
+                        return (
+                          <option 
+                            key={color} 
+                            value={color}
+                            disabled={!isAllowed}
+                            style={!isAllowed ? { color: '#999', fontStyle: 'italic' } : {}}
+                          >
+                            {color}{!isAllowed ? ' (Out of Stock)' : ''}
+                          </option>
+                        );
+                      })}
                     </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Only black, forest green, magenta, and lavender are available. Other colors are out of stock.
+                    </p>
                   </div>
 
                   <div>
