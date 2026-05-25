@@ -47,7 +47,7 @@ const HomeProducts = () => {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Organic By FilamentFreaks
+            3D Printing Filament
           </button>
         </div>
       </div>

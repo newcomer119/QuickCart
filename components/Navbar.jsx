@@ -61,7 +61,7 @@ const Navbar = () => {
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   onClick={() => setIsShopDropdownOpen(false)}
                 >
-                  Organic By FilamentFreaks
+                  3D Printing Filament
                 </Link>
               </div>
             )}
