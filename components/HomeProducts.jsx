@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ProductCard from "./ProductCard";
 import { useAppContext } from "@/context/AppContext";
+import { isFilamentCategory } from "@/lib/productCategories";
 
 const HomeProducts = () => {
   const { products, router, setIsLoading, isLoading } = useAppContext();
@@ -20,7 +21,7 @@ const HomeProducts = () => {
     if (selectedCategory === "3d-printed") {
       return product.category === "Accessories";
     } else {
-      return product.category === "Organics by Filament Freaks";
+      return isFilamentCategory(product.category);
     }
   });
 

@@ -19,8 +19,8 @@ const products = [
   {
     id: 3,
     image: assets.boy_with_laptop_image,
-    title: "Professional 3D Solutions",
-    description: "State-of-the-art 3D solutions for professional results.",
+    title: "Professional 3D Printing Filament",
+    description: "Premium Quality 3D Printing Filament",
   },
 ];
 
@@ -28,10 +28,12 @@ const FeaturedProduct = () => {
   const router = useRouter();
 
   const handleShopNow = (title) => {
-    if (title === 'Custom 3D Designs') {
-      router.push('/explore-collection');
+    if (title === "Custom 3D Designs") {
+      router.push("/explore-collection");
+    } else if (title === "Professional 3D Printing Filament") {
+      router.push("/organic-products");
     } else {
-      router.push('/all-products');
+      router.push("/all-products");
     }
   };
 
@@ -55,11 +57,16 @@ const FeaturedProduct = () => {
               <p className="text-sm lg:text-base leading-5 max-w-60">
                 {description}
               </p>
-              <button 
+              <button
                 onClick={() => handleShopNow(title)}
                 className="flex items-center gap-1.5 bg-orange-600 px-4 py-2 rounded hover:bg-orange-700 transition"
               >
-                Shop Now <Image className="h-3 w-3" src={assets.redirect_icon} alt="Redirect Icon" />
+                Shop Now{" "}
+                <Image
+                  className="h-3 w-3"
+                  src={assets.redirect_icon}
+                  alt="Redirect Icon"
+                />
               </button>
             </div>
           </div>

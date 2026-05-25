@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { isFilamentCategory } from "@/lib/productCategories";
 
 const OrderSummary = () => {
   const {
@@ -111,7 +112,7 @@ const OrderSummary = () => {
       const product = products.find(p => p._id === productId);
       if (!product) continue;
       const lineTotal = (product.offerPrice || 0) * cartItem.quantity;
-      if (product.category === "Organics by Filament Freaks") {
+      if (isFilamentCategory(product.category)) {
         organicGross += lineTotal;
       } else {
         otherGross += lineTotal;

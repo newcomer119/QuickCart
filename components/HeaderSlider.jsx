@@ -8,10 +8,11 @@ const HeaderSlider = () => {
   const sliderData = [
     {
       id: 1,
-      title:  "State-of-the-art 3D solutions for professional results",
+      title: "State-of-the-art 3D solutions for professional results",
       offer: "Professional 3D Solutions",
-      buttonText1: "Shop now",
-      buttonText2: "Find more",
+      buttonText1: "Find More",
+      buttonLink1: "/explore-collection",
+      showButton2: false,
       imgSrc: assets.Printer,
     },
     {
@@ -19,7 +20,10 @@ const HeaderSlider = () => {
       title: "Bringing pixels to Reality",
       offer: "Turn your creativity into reality with our best-selling products",
       buttonText1: "Shop Now",
+      buttonLink1: "/all-products",
       buttonText2: "Explore Deals",
+      showButton2: true,
+      showButton2Arrow: true,
       imgSrc: assets.banner2,
     },
     {
@@ -27,7 +31,9 @@ const HeaderSlider = () => {
       title: "Bringing Ideas to life, Layer by Layer",
       offer: "Get the best custom prints with high-quality filament",
       buttonText1: "Shop Now",
+      buttonLink1: "/all-products",
       buttonText2: "Learn More",
+      showButton2: false,
       imgSrc: assets.banner3,
     },
   ];
@@ -36,7 +42,6 @@ const HeaderSlider = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
 
   useEffect(() => {
@@ -50,8 +55,8 @@ const HeaderSlider = () => {
     setCurrentSlide(index);
   };
 
-  const handleShopNow = () => {
-    router.push('/all-products');
+  const handlePrimaryClick = (link) => {
+    router.push(link);
   };
 
   const onTouchStart = (e) => {
@@ -65,16 +70,14 @@ const HeaderSlider = () => {
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
     if (isLeftSwipe) {
-      // Swipe left - go to next slide
       setCurrentSlide((prev) => (prev + 1) % sliderData.length);
     } else if (isRightSwipe) {
-      // Swipe right - go to previous slide
       setCurrentSlide((prev) => (prev - 1 + sliderData.length) % sliderData.length);
     }
   };
@@ -101,16 +104,24 @@ const HeaderSlider = () => {
                 {slide.title}
               </h1>
               <div className="flex items-center mt-4 md:mt-6 ">
-                <button 
-                  onClick={handleShopNow}
+                <button
+                  onClick={() => handlePrimaryClick(slide.buttonLink1)}
                   className="md:px-10 px-7 md:py-2.5 py-2 bg-orange-600 rounded-full text-white font-medium hover:bg-orange-700 transition"
                 >
                   {slide.buttonText1}
                 </button>
-                <button className="group flex items-center gap-2 px-6 py-2.5 font-medium">
-                  {slide.buttonText2}
-                  <Image className="group-hover:translate-x-1 transition" src={assets.arrow_icon} alt="arrow_icon" />
-                </button>
+                {slide.showButton2 && (
+                  <button className="group flex items-center gap-2 px-6 py-2.5 font-medium">
+                    {slide.buttonText2}
+                    {slide.showButton2Arrow && (
+                      <Image
+                        className="group-hover:translate-x-1 transition"
+                        src={assets.arrow_icon}
+                        alt="arrow_icon"
+                      />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
             <div className="flex items-center flex-1 justify-center">

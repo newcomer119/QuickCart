@@ -8,6 +8,7 @@ import connectDb from "@/config/db";
 import Order from "@/models/Order";
 import mongoose from "mongoose";
 import { generateCustomOrderId } from "@/lib/orderIdGenerator";
+import { isFilamentCategory } from "@/lib/productCategories";
 
 function isValidObjectId(id) {
     return mongoose.Types.ObjectId.isValid(id);
@@ -78,7 +79,7 @@ export async function POST(request) {
             const product = await Product.findById(productId);
             if (!product) continue;
             const lineTotal = (product.offerPrice || 0) * item.quantity;
-            if (product.category === "Organics by Filament Freaks") {
+            if (isFilamentCategory(product.category)) {
                 organicGross += lineTotal;
             } else {
                 otherGross += lineTotal;

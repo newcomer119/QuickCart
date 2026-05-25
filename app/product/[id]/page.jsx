@@ -82,10 +82,7 @@ const Product = () => {
       (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
     );
     if (hasMultipleColors && !selectedColor) {
-      const message = productData.category === "Organics by Filament Freaks" 
-        ? "Please select a fragrance" 
-        : "Please select a color";
-      toast.error(message);
+      toast.error("Please select a color");
       return;
     }
     addToCart(productData._id, selectedColor, selectedColorImage);
@@ -102,10 +99,7 @@ const Product = () => {
       (typeof productData.colors === 'string' && productData.colors.split(/(?=[A-Z])/).length > 1)
     );
     if (hasMultipleColors && !selectedColor) {
-      const message = productData.category === "Organics by Filament Freaks" 
-        ? "Please select a fragrance" 
-        : "Please select a color";
-      toast.error(message);
+      toast.error("Please select a color");
       return;
     }
     const cartKey = selectedColor ? `${productData._id}_${selectedColor}` : productData._id;
@@ -247,12 +241,9 @@ const Product = () => {
             </p>
             <hr className="bg-gray-600 my-6" />
             
-            {/* Color/Fragrance Selection */}
             {productData.colors && productData.colors.length > 0 ? (
               <div className="mb-6">
-                <p className="text-base font-medium mb-3">
-                  {productData.category === "Organics by Filament Freaks" ? "Select Fragrance:" : "Select Color:"}
-                </p>
+                <p className="text-base font-medium mb-3">Select Color:</p>
                 <div className="flex flex-wrap gap-2">
                   {Array.isArray(productData.colors) ? (
                     productData.colors.map((item) => (
@@ -319,12 +310,8 @@ const Product = () => {
               </div>
             ) : (
               <div className="mb-6">
-                <p className="text-base font-medium mb-3">
-                  {productData.category === "Organics by Filament Freaks" ? "Fragrance:" : "Color:"}
-                </p>
-                <p className="text-gray-600">
-                  {productData.category === "Organics by Filament Freaks" ? "No different fragrances" : "No different colors"}
-                </p>
+                <p className="text-base font-medium mb-3">Color:</p>
+                <p className="text-gray-600">No different colors</p>
               </div>
             )}
             {/* Debug info - remove this later */}
@@ -336,22 +323,20 @@ const Product = () => {
                     <td className="text-gray-800/50 ">Filament Freaks</td>
                   </tr>
                   <tr>
-                    <td className="text-gray-600 font-medium">
-                      {productData.category === "Organics by Filament Freaks" ? "Fragrance" : "Color"}
-                    </td>
+                    <td className="text-gray-600 font-medium">Color</td>
                     <td className="text-gray-800/50 ">
                       {productData.colors && productData.colors.length > 0 ? (
                         Array.isArray(productData.colors) 
                           ? (productData.colors.length > 1 
-                              ? `${productData.colors.length} ${productData.category === "Organics by Filament Freaks" ? "fragrances" : "colors"} available`
+                              ? `${productData.colors.length} colors available`
                               : productData.colors[0]
                             )
                           : (productData.colors.split(/(?=[A-Z])/).length > 1
-                              ? `${productData.colors.split(/(?=[A-Z])/).length} ${productData.category === "Organics by Filament Freaks" ? "fragrances" : "colors"} available`
+                              ? `${productData.colors.split(/(?=[A-Z])/).length} colors available`
                               : productData.colors
                             )
                       ) : (
-                        productData.category === "Organics by Filament Freaks" ? "No different fragrances" : "No different colors"
+                        "No different colors"
                       )}
                     </td>
                   </tr>

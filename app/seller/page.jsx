@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { FILAMENT_CATEGORY } from "@/lib/productCategories";
+import { AVAILABLE_COLORS } from "@/lib/productColors";
 
 const AddProduct = () => {
   const {getToken, setIsLoading} = useAppContext()
@@ -16,55 +18,6 @@ const AddProduct = () => {
   const [selectedColorImages, setSelectedColorImages] = useState({});
   const [price, setPrice] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
-
-  const availableColors = [
-    'Pitch black',
-    'Pure white', 
-    'Lemon yellow',
-    'Mauve purple',
-    'Nuclear red',
-    'Outrageous orange',
-    'Atomic pink',
-    'Royal blue',
-    'Light grey',
-    'Light blue',
-    'Grass green',
-    'Beige brown',
-    'Teal blue',
-    'Army green',
-    'Dark grey',
-    'Ivory white',
-    'Rust copper',
-    'Appricot',
-    'Lagoon blue',
-    'Forest green',
-    'Fluorescent orange',
-    'Fluorescent green',
-    'Transparent',
-    'Bhama yellow',
-    'Chocolate brown',
-    'Fluorescent yellow',
-    'Levender violet',
-    'Magenta',
-    'Military khaki',
-    'Ryobix green',
-    'Simply silver',
-    'Midnight grey',
-    'Thanos purple',
-    'Cool( lithopane ) white'
-  ];
-
-  const availableFragrances = [
-    'JASMINE',
-    'ASHTAGANDHA',
-    'KESAR CHANDAN',
-    'LAVENDER',
-    'MOGRA',
-    'GULAB',
-    'LOBHAN',
-    'KAPOOR',
-    'GUGAL'
-  ];
 
   const handleColorChange = (color) => {
     setSelectedColorImages(prev => {
@@ -89,22 +42,14 @@ const AddProduct = () => {
       return;
     }
 
-    // Check if at least one color/fragrance is selected
     if (Object.keys(selectedColorImages).length === 0) {
-      const message = category === "Organics by Filament Freaks" 
-        ? "Please select at least one fragrance" 
-        : "Please select at least one color";
-      toast.error(message);
+      toast.error("Please select at least one color");
       return;
     }
 
-    // Check if every selected color/fragrance has an image
     const missingImage = Object.entries(selectedColorImages).some(([item, file]) => !file);
     if (missingImage) {
-      const message = category === "Organics by Filament Freaks" 
-        ? "Please upload an image for each selected fragrance" 
-        : "Please upload an image for each selected color";
-      toast.error(message);
+      toast.error("Please upload an image for each selected color");
       return;
     }
 
@@ -265,7 +210,7 @@ const AddProduct = () => {
               <option value="Laptop">Laptop</option>
               <option value="Camera">Camera</option>
               <option value="Accessories">Accessories</option>
-              <option value="Organics by Filament Freaks">Organics by Filament Freaks</option>
+              <option value={FILAMENT_CATEGORY}>{FILAMENT_CATEGORY}</option>
             </select>
           </div>
           <div className="flex flex-col gap-1 w-32">
@@ -298,13 +243,10 @@ const AddProduct = () => {
           </div>
         </div>
 
-        {/* Color/Fragrance Selection */}
         <div className="flex flex-col gap-1 max-w-md">
-          <label className="text-base font-medium">
-            {category === "Organics by Filament Freaks" ? "Available Fragrances" : "Available Colors"}
-          </label>
+          <label className="text-base font-medium">Available Colors</label>
           <div className="flex flex-wrap gap-3 mt-2">
-            {(category === "Organics by Filament Freaks" ? availableFragrances : availableColors).map((item) => (
+            {AVAILABLE_COLORS.map((item) => (
               <div key={item} className="flex flex-col items-start">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input

@@ -4,6 +4,7 @@ import { AppContextProvider } from "@/context/AppContext";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/nextjs";
 import LoadingOverlayWrapper from "@/components/LoadingOverlayWrapper";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"] });
 
@@ -41,6 +42,7 @@ export default function RootLayout({ children }) {
           <AppContextProvider>
             <LoadingOverlayWrapper />
             {children}
+            <WhatsAppButton />
           </AppContextProvider>
         </body>
       </html>
