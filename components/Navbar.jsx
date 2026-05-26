@@ -57,7 +57,7 @@ const Navbar = () => {
                   3D Printed Products
                 </Link>
                 <Link
-                  href="/organic-products"
+                  href="/3d-printing-filament"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   onClick={() => setIsShopDropdownOpen(false)}
                 >
@@ -146,7 +146,7 @@ const Navbar = () => {
                   <UserButton.Action
                     label="Organic Products"
                     labelIcon={<BoxIcon />}
-                    onClick={() => router.push("/organic-products")}
+                    onClick={() => router.push("/3d-printing-filament")}
                   />
                 </UserButton.MenuItems>
                 <UserButton.MenuItems>

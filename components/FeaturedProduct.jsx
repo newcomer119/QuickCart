@@ -31,7 +31,7 @@ const FeaturedProduct = () => {
     if (title === "Custom 3D Designs") {
       router.push("/explore-collection");
     } else if (title === "Professional 3D Printing Filament") {
-      router.push("/organic-products");
+      router.push("/3d-printing-filament");
     } else {
       router.push("/all-products");
     }

@@ -12,7 +12,7 @@ const HomeProducts = () => {
     if (selectedCategory === "3d-printed") {
       router.push("/3d-printed-products");
     } else {
-      router.push("/organic-products");
+      router.push("/3d-printing-filament");
     }
   };
 

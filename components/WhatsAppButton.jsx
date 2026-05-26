@@ -3,7 +3,7 @@
 import React from "react";
 import { FaWhatsapp } from "react-icons/fa";
 
-const WHATSAPP_NUMBER = "9189698119911";
+const WHATSAPP_NUMBER = "918533801868";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Hi Filament Freaks! I have a question about your products."
 )}`;

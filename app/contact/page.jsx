@@ -37,7 +37,7 @@ export default function ContactPage() {
               <FaPhoneAlt className="text-pink-600 text-2xl" />
               <div>
                 <span className="font-bold">Customer Support</span><br />
-                +91-89698119911
+                +91-8533801868
               </div>
             </div>
             <div className="flex items-center gap-3">
