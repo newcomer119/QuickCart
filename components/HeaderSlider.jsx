@@ -28,7 +28,7 @@ const HeaderSlider = () => {
     },
     {
       id: 3,
-      title: "Bringing Ideas to life, Layer by Layer",
+      title: "Premium PLA+ 3D Printing Filament in India",
       offer: "Get the best custom prints with high-quality filament",
       buttonText1: "Shop Now",
       buttonLink1: "/all-products",

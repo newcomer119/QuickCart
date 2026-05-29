@@ -9,8 +9,8 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"] });
 
 export const metadata = {
-  title: "FilamentFreaks",
-  description: "Online Store For 3d Material ",
+  title: "Custom 3D Printing & Premium PLA+ Filament Store India | Filament Freaks",
+  description: "Filament Freaks offers custom 3D printing services, personalized 3D printed products, lamps, word art, prototypes, and premium PLA+ filaments across India.",
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },

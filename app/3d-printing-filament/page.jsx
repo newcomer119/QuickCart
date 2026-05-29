@@ -28,6 +28,11 @@ const FilamentProducts = () => {
             <div className="flex flex-col items-start px-6 md:px-16 lg:px-32">
                 <div className="flex flex-col items-end pt-12">
                     <p className="text-2xl font-medium">3D Printing Filament</p>
+                    <p>PLA+ Filaments
+                       Our PLA+ filaments are designed for smooth printing, strong 
+                       layer adhesion, durability, and high-quality 3D printing results 
+                       for creators and professionals.
+                    </p>
                     <div className="w-16 h-0.5 bg-orange-600 rounded-full"></div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-col items-center gap-6 mt-6 pb-14 w-full">

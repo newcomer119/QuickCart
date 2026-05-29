@@ -10,10 +10,9 @@ const Footer = () => {
         <div className="w-4/5">
           <Image className="w-28 md:w-32" src={assets.logo} alt="logo" />
           <p className="mt-6 text-sm text-justify leading-relaxed">
-            Your premier destination for all things 3D printing. We specialize in high-quality filaments, 
-            professional-grade 3D printers, and custom designs. Whether you're a hobbyist or a professional, 
-            we provide everything you need to bring your 3D printing projects to life. From PLA to PETG, 
-            from entry-level to industrial printers, we've got you covered with the best products and expert support.
+            Filament Freaks is a 3D printing brand in India specializing in custom 3D printed products, 
+            personalized designs, decorative lamps, word art, prototypes, and premium PLA+ filaments for 
+            creators, businesses, and makers.
           </p>
         </div>
 
