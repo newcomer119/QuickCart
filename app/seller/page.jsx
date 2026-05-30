@@ -98,7 +98,7 @@ const AddProduct = () => {
         setName('');
         setDescription('');
         setAdditionalInfo('');
-        setCategory('Earphone');
+        setCategory('3D Printed Wordart');
         setSelectedColorImages({});
         setPrice('');
         setOfferPrice('');
@@ -203,13 +203,13 @@ const AddProduct = () => {
               onChange={(e) => setCategory(e.target.value)}
               value={category}
             >
-              <option value="Earphone">Earphone</option>
-              <option value="Headphone">Headphone</option>
-              <option value="Watch">Watch</option>
-              <option value="Smartphone">Smartphone</option>
-              <option value="Laptop">Laptop</option>
-              <option value="Camera">Camera</option>
-              <option value="Accessories">Accessories</option>
+              <option value="3D Printed Wordart">3D Printer Wordart</option>
+              <option value="3D Printed Desk Essentials">3D Printed Desk Essentials</option>
+              <option value="3D Printed Lamps">3D Printed Lamps</option>
+              <option value="3D Printed Keychain">3D Printed Keychain</option>
+              <option value="3D Printed Decor Essentials">3D Printed Decor Essentials</option>
+              <option value="3D Printed Laptop Accessories">3D Printed Laptop Accessories</option>
+              <option value="Accessories">3D Printed Gaming Accessories</option>
               <option value={FILAMENT_CATEGORY}>{FILAMENT_CATEGORY}</option>
             </select>
           </div>
