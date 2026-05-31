@@ -54,13 +54,13 @@ export default function ShopCategoryPage() {
           <span className="text-gray-800">{title}</span>
         </nav>
 
-        <div className="flex flex-col items-end w-full pt-4">
-          <h1 className="text-2xl font-medium">{title}</h1>
-          <div className="ml-auto h-0.5 w-full rounded-full bg-orange-600" />
+        <div className="flex flex-col items-start w-full pt-4">
+          <h1 className="text-2xl font-medium text-left">{title}</h1>
+          <div className="h-0.5 w-full max-w-md rounded-full bg-orange-600 mt-1" />
         </div>
 
         {shopCategory.description && (
-          <p className="mt-6 max-w-xl text-sm text-justify leading-relaxed text-gray-600">
+          <p className="mt-6 max-w-xl text-sm text-left leading-relaxed text-gray-600">
             {shopCategory.description}
           </p>
         )}
