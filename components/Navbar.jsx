@@ -54,7 +54,49 @@ const Navbar = () => {
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
                   onClick={() => setIsShopDropdownOpen(false)}
                 >
-                  3D Printed Products
+                  3D Printed Wordart
+                </Link>
+                <Link
+                  href="/3d-printing-filament"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  onClick={() => setIsShopDropdownOpen(false)}
+                >
+                  3D Printed Desk Essentials
+                </Link>
+                <Link
+                  href="/3d-printing-filament"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  onClick={() => setIsShopDropdownOpen(false)}
+                >
+                  3D Printed Keychains
+                </Link>
+                <Link
+                  href="/3d-printing-filament"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  onClick={() => setIsShopDropdownOpen(false)}
+                >
+                  3D Printed Lamps
+                </Link>
+                <Link
+                  href="/3d-printing-filament"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  onClick={() => setIsShopDropdownOpen(false)}
+                >
+                  3D Printed Decor Essentials
+                </Link>
+                <Link
+                  href="/3d-printing-filament"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  onClick={() => setIsShopDropdownOpen(false)}
+                >
+                  3D Printed Laptop Accessories
+                </Link>
+                <Link
+                  href="/3d-printing-filament"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                  onClick={() => setIsShopDropdownOpen(false)}
+                >
+                  3D Printed Gaming Accessories
                 </Link>
                 <Link
                   href="/3d-printing-filament"
