@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { FILAMENT_CATEGORY } from "@/lib/productCategories";
+import { SHOP_CATEGORIES } from "@/lib/productCategories";
 import { AVAILABLE_COLORS } from "@/lib/productColors";
 
 const AddProduct = () => {
@@ -428,14 +428,11 @@ const AddProduct = () => {
               onChange={(e) => setCategory(e.target.value)}
               value={category}
             >
-              <option value="3D Printed Wordart">3D Printed Wordart</option>
-              <option value="3D Printed Desk Essentials">3D Printed Desk Essentials</option>
-              <option value="3D Printed Lamps">3D Printed Lamps</option>
-              <option value="3D Printed Keychain">3D Printed Keychain</option>
-              <option value="3D Printed Decor Essentials">3D Printed Decor Essentials</option>
-              <option value="3D Printed Laptop Accessories">3D Printed Laptop Accessories</option>
-              <option value="Accessories">3D Printed Gaming Accessories</option>
-              <option value={FILAMENT_CATEGORY}>{FILAMENT_CATEGORY}</option>
+              {SHOP_CATEGORIES.map((cat) => (
+                <option key={cat.slug} value={cat.name}>
+                  {cat.navLabel}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex flex-col gap-1 w-32">

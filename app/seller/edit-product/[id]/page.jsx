@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
-import { FILAMENT_CATEGORY, normalizeFilamentCategory } from "@/lib/productCategories";
+import { SHOP_CATEGORIES, normalizeFilamentCategory } from "@/lib/productCategories";
 import { AVAILABLE_COLORS } from "@/lib/productColors";
 
 const EditProduct = () => {
@@ -203,14 +203,14 @@ const EditProduct = () => {
                     <div className="flex flex-col gap-1 w-32">
                         <label className="text-base font-medium" htmlFor="category">Category</label>
                         <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40">
-                            <option value="Earphone">Earphone</option>
-                            <option value="Headphone">Headphone</option>
-                            <option value="Watch">Watch</option>
-                            <option value="Smartphone">Smartphone</option>
-                            <option value="Laptop">Laptop</option>
-                            <option value="Camera">Camera</option>
-                            <option value="Accessories">Accessories</option>
-                            <option value={FILAMENT_CATEGORY}>{FILAMENT_CATEGORY}</option>
+                            {!SHOP_CATEGORIES.some((c) => c.name === category) && category && (
+                                <option value={category}>{category}</option>
+                            )}
+                            {SHOP_CATEGORIES.map((cat) => (
+                                <option key={cat.slug} value={cat.name}>
+                                    {cat.navLabel}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className="flex flex-col gap-1 w-32">

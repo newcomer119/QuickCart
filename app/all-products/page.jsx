@@ -10,7 +10,7 @@ const AllProducts = () => {
     useEffect(() => {
         // Redirect to 3D printed products page
         setIsLoading(false);
-        router.push("/3d-printed-products");
+        router.push("/shop/all-3d-printed");
     }, [setIsLoading, router]);
 
     return null; // This component will redirect immediately

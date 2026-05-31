@@ -2,6 +2,10 @@ import React from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import {
+  ALL_3D_PRINTED_SLUG,
+  getCategoryPagePath,
+} from "@/lib/productCategories";
 
 const products = [
   {
@@ -31,9 +35,9 @@ const FeaturedProduct = () => {
     if (title === "Custom 3D Designs") {
       router.push("/explore-collection");
     } else if (title === "Professional 3D Printing Filament") {
-      router.push("/3d-printing-filament");
+      router.push(getCategoryPagePath("3d-printing-filament"));
     } else {
-      router.push("/all-products");
+      router.push(getCategoryPagePath(ALL_3D_PRINTED_SLUG));
     }
   };
 

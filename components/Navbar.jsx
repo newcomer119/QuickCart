@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
 import { useClerk, UserButton, useUser } from "@clerk/nextjs";
+import { SHOP_CATEGORIES } from "@/lib/productCategories";
 
 const Navbar = () => {
   const { isSeller, router, user } = useAppContext();
@@ -48,63 +49,17 @@ const Navbar = () => {
               </svg>
             </button>
             {isShopDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                <Link
-                  href="/3d-printed-products"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Wordart
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Desk Essentials
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Keychains
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Lamps
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Decor Essentials
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Laptop Accessories
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printed Gaming Accessories
-                </Link>
-                <Link
-                  href="/3d-printing-filament"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                  onClick={() => setIsShopDropdownOpen(false)}
-                >
-                  3D Printing Filament
-                </Link>
+              <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-[70vh] overflow-y-auto">
+                {SHOP_CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/shop/${cat.slug}`}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                    onClick={() => setIsShopDropdownOpen(false)}
+                  >
+                    {cat.navLabel}
+                  </Link>
+                ))}
               </div>
             )}
           </div>
@@ -177,20 +132,15 @@ const Navbar = () => {
                     onClick={() => router.push("/")}
                   />
                 </UserButton.MenuItems>
-                <UserButton.MenuItems>
-                  <UserButton.Action
-                    label="3D Printed Products"
-                    labelIcon={<BoxIcon />}
-                    onClick={() => router.push("/3d-printed-products")}
-                  />
-                </UserButton.MenuItems>
-                <UserButton.MenuItems>
-                  <UserButton.Action
-                    label="Organic Products"
-                    labelIcon={<BoxIcon />}
-                    onClick={() => router.push("/3d-printing-filament")}
-                  />
-                </UserButton.MenuItems>
+                {SHOP_CATEGORIES.map((cat) => (
+                  <UserButton.MenuItems key={cat.slug}>
+                    <UserButton.Action
+                      label={cat.navLabel}
+                      labelIcon={<BoxIcon />}
+                      onClick={() => router.push(`/shop/${cat.slug}`)}
+                    />
+                  </UserButton.MenuItems>
+                ))}
                 <UserButton.MenuItems>
                   <UserButton.Action
                     label="Cart"

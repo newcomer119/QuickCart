@@ -7,6 +7,7 @@ import {
   parseLabeledItems,
   parseSpecLines,
   parseFaqs,
+  getDimensionRows,
 } from "@/lib/parseProductFields";
 import { assets } from "@/assets/assets";
 
@@ -126,6 +127,48 @@ function SpecTable({ title, rows, fallbackRows }) {
   );
 }
 
+/** Dimensions & weight — always shows all four rows */
+export function DimensionsWeightTable({ product, compact = false, className = "" }) {
+  const rows = getDimensionRows(product);
+  return (
+    <div className={className}>
+      <h3
+        className={`font-semibold text-gray-900 mb-2 ${
+          compact ? "text-sm" : "text-base mb-3"
+        }`}
+      >
+        Dimensions & Weight
+      </h3>
+      <table
+        className={`w-full border border-gray-200 rounded-lg overflow-hidden ${
+          compact ? "text-xs" : "text-sm"
+        }`}
+      >
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={row.label} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+              <td
+                className={`font-medium text-gray-600 border-b border-gray-100 w-2/5 ${
+                  compact ? "px-3 py-2" : "px-4 py-2.5"
+                }`}
+              >
+                {row.label}
+              </td>
+              <td
+                className={`text-gray-800 border-b border-gray-100 ${
+                  compact ? "px-3 py-2" : "px-4 py-2.5"
+                }`}
+              >
+                {row.value}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function SpecsAndDimensionsSection({ product }) {
   const customSpecs = parseSpecLines(product.technicalSpecifications);
   const defaultSpecs = [
@@ -142,13 +185,6 @@ export function SpecsAndDimensionsSection({ product }) {
     { label: "Country of Origin", value: "India" },
   ];
 
-  const dimensionRows = [
-    product.length != null && { label: "Length", value: `${product.length} cm` },
-    product.height != null && { label: "Height", value: `${product.height} cm` },
-    product.depth != null && { label: "Depth", value: `${product.depth} cm` },
-    product.weight != null && { label: "Weight", value: `${product.weight} g` },
-  ].filter(Boolean);
-
   return (
     <section className="py-10 border-t border-gray-200">
       <SectionHeading
@@ -161,7 +197,7 @@ export function SpecsAndDimensionsSection({ product }) {
           rows={customSpecs}
           fallbackRows={defaultSpecs}
         />
-        <SpecTable title="Dimensions & Weight" rows={dimensionRows} fallbackRows={[]} />
+        <DimensionsWeightTable product={product} />
       </div>
     </section>
   );

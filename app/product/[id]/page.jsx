@@ -11,11 +11,13 @@ import Loading from "@/components/Loading";
 import { useAppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import { FiCheck, FiMinus, FiPlus } from "react-icons/fi";
+import { getCategoryHref } from "@/lib/productCategories";
 import {
   ProductDescriptionSection,
   KeyFeaturesSection,
   MaterialSection,
   SpecsAndDimensionsSection,
+  DimensionsWeightTable,
   CompatibilitySection,
   IdealForSection,
   IncludedAndCareSection,
@@ -28,13 +30,6 @@ const TRUST_BADGES = [
   { label: "Made in India", sub: "Proudly Designed" },
   { label: "Secure Packaging", sub: "Safe Delivery" },
 ];
-
-function getCategoryHref(category) {
-  if (!category) return "/all-products";
-  const c = category.toLowerCase();
-  if (c.includes("filament")) return "/3d-printing-filament";
-  return "/3d-printed-products";
-}
 
 const Product = () => {
   const { id } = useParams();
@@ -330,6 +325,12 @@ const Product = () => {
             <p className="text-gray-600 mt-4 leading-relaxed line-clamp-4">
               {shortText}
             </p>
+
+            <DimensionsWeightTable
+              product={productData}
+              compact
+              className="mt-6 max-w-sm"
+            />
 
             <div className="grid grid-cols-3 gap-3 mt-6">
               {TRUST_BADGES.map((badge) => (

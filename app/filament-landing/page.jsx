@@ -59,7 +59,7 @@ export default function FilamentLandingPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center md:justify-start">
               <button
-                onClick={() => router.push("/3d-printing-filament")}
+                onClick={() => router.push("/shop/3d-printing-filament")}
                 className="rounded-full bg-orange-600 px-8 py-3 font-medium text-white transition hover:bg-orange-700"
               >
                 Order Now
@@ -169,7 +169,7 @@ export default function FilamentLandingPage() {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <button
-              onClick={() => router.push("/3d-printing-filament")}
+              onClick={() => router.push("/shop/3d-printing-filament")}
               className="rounded-full bg-white px-8 py-3 font-medium text-orange-600 transition hover:bg-orange-50"
             >
               Order Now

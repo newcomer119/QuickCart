@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import ProductCard from "./ProductCard";
 import { useAppContext } from "@/context/AppContext";
-import { isFilamentCategory } from "@/lib/productCategories";
+import {
+  isFilamentCategory,
+  ALL_3D_PRINTED_SLUG,
+  getCategoryPagePath,
+} from "@/lib/productCategories";
 
 const HomeProducts = () => {
   const { products, router, setIsLoading, isLoading } = useAppContext();
@@ -10,19 +14,18 @@ const HomeProducts = () => {
   const handleSeeMore = () => {
     setIsLoading(true);
     if (selectedCategory === "3d-printed") {
-      router.push("/3d-printed-products");
+      router.push(getCategoryPagePath(ALL_3D_PRINTED_SLUG));
     } else {
-      router.push("/3d-printing-filament");
+      router.push(getCategoryPagePath("3d-printing-filament"));
     }
   };
 
   // Filter products based on selected category
   const filteredProducts = products.filter(product => {
     if (selectedCategory === "3d-printed") {
-      return product.category === "Accessories";
-    } else {
-      return isFilamentCategory(product.category);
+      return !isFilamentCategory(product.category);
     }
+    return isFilamentCategory(product.category);
   });
 
   return (
