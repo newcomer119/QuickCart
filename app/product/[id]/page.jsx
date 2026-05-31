@@ -260,7 +260,7 @@ const Product = () => {
                       alt=""
                       width={80}
                       height={80}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </button>
                 ))}
@@ -271,7 +271,7 @@ const Product = () => {
                 src={displayImage}
                 alt={productData.name}
                 fill
-                className="object-cover mix-blend-multiply"
+                className="object-contain mix-blend-multiply"
                 priority
               />
             </div>
