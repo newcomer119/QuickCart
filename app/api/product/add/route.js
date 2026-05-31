@@ -36,11 +36,27 @@ export async function POST(request) {
 
         const name = formData.get('name');
         const description = formData.get('description');
+        const overview = formData.get('overview');
         const additionalInfo = formData.get('additionalInfo');
+        const idealFor = formData.get('idealFor');
+        const keyFeatures = formData.get('keyFeatures');
+        const compatibility = formData.get('compatibility');
+        const technicalSpecifications = formData.get('technicalSpecifications');
+        const materialType = formData.get('materialType');
         const category = formData.get('category');
         const colorsJson = formData.get('colors');
         const price = formData.get('price');
         const offerPrice = formData.get('offerPrice');
+        const length = formData.get('length');
+        const height = formData.get('height');
+        const depth = formData.get('depth');
+        const weight = formData.get('weight');
+        const boxIncludes = formData.get('boxIncludes');
+        const careInstructions = formData.get('careInstructions');
+        const faq1 = formData.get('faq1');
+        const faq2 = formData.get('faq2');
+        const faq3 = formData.get('faq3');
+        const faq4 = formData.get('faq4');
         const files = formData.getAll('images');
 
         console.log("Files received:", files.length); // Debug log
@@ -143,12 +159,28 @@ export async function POST(request) {
             userId,
             name,
             description,
+            overview,
             additionalInfo,
+            idealFor,
+            keyFeatures,
+            compatibility,
+            technicalSpecifications,
+            materialType,
             category,
             colors,
             colorImages,
             price: Number(price),
             offerPrice: Number(offerPrice),
+            length: length ? Number(length) : undefined,
+            height: height ? Number(height) : undefined,
+            depth: depth ? Number(depth) : undefined,
+            weight: weight ? Number(weight) : undefined,
+            boxIncludes,
+            careInstructions,
+            faq1,
+            faq2,
+            faq3,
+            faq4,
             image: images,
             date: Date.now()
         });

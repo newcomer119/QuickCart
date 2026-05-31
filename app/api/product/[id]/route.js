@@ -69,13 +69,22 @@ export async function PUT(request, { params }) {
         const formData = await request.formData();
         const updateData = {};
         
-        // Basic fields
-        if (formData.has('name')) updateData.name = formData.get('name');
-        if (formData.has('description')) updateData.description = formData.get('description');
-        if (formData.has('additionalInfo')) updateData.additionalInfo = formData.get('additionalInfo');
-        if (formData.has('category')) updateData.category = formData.get('category');
+        const textFields = [
+            'name', 'description', 'overview', 'additionalInfo', 'idealFor',
+            'keyFeatures', 'compatibility', 'technicalSpecifications', 'materialType',
+            'category', 'boxIncludes', 'careInstructions', 'faq1', 'faq2', 'faq3', 'faq4'
+        ];
+        textFields.forEach((field) => {
+            if (formData.has(field)) updateData[field] = formData.get(field);
+        });
         if (formData.has('price')) updateData.price = Number(formData.get('price'));
         if (formData.has('offerPrice')) updateData.offerPrice = Number(formData.get('offerPrice'));
+        ['length', 'height', 'depth', 'weight'].forEach((field) => {
+            if (formData.has(field)) {
+                const val = formData.get(field);
+                updateData[field] = val ? Number(val) : undefined;
+            }
+        });
 
         // Handle colors
         if (formData.has('colors')) {
