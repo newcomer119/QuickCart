@@ -287,7 +287,7 @@ const Product = () => {
                 {[1, 2, 3, 4].map((i) => (
                   <Image
                     key={i}
-                    className="h-4 w-4"
+                    className="h-4 w-4 object-contain"
                     src={assets.star_icon}
                     alt=""
                     width={16}
@@ -295,7 +295,7 @@ const Product = () => {
                   />
                 ))}
                 <Image
-                  className="h-4 w-4"
+                  className="h-4 w-4 object-contain"
                   src={assets.star_dull_icon}
                   alt=""
                   width={16}
