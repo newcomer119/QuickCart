@@ -363,7 +363,7 @@ const Product = () => {
                         <img
                           src={productData.colorImages[color]}
                           alt=""
-                          className="w-5 h-5 rounded-full object-cover"
+                          className="w-5 h-5 rounded-full object-contain"
                         />
                       )}
                       {color}
