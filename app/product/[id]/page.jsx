@@ -326,12 +326,6 @@ const Product = () => {
               {shortText}
             </p>
 
-            <DimensionsWeightTable
-              product={productData}
-              compact
-              className="mt-6 max-w-sm"
-            />
-
             <div className="grid grid-cols-3 gap-3 mt-6">
               {TRUST_BADGES.map((badge) => (
                 <div
