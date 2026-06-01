@@ -260,7 +260,7 @@ const Product = () => {
                       alt=""
                       width={80}
                       height={80}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </button>
                 ))}
@@ -271,7 +271,7 @@ const Product = () => {
                 src={displayImage}
                 alt={productData.name}
                 fill
-                className="object-cover mix-blend-multiply"
+                className="object-contain mix-blend-multiply"
                 priority
               />
             </div>
@@ -287,7 +287,7 @@ const Product = () => {
                 {[1, 2, 3, 4].map((i) => (
                   <Image
                     key={i}
-                    className="h-4 w-4"
+                    className="h-4 w-4 object-contain"
                     src={assets.star_icon}
                     alt=""
                     width={16}
@@ -295,7 +295,7 @@ const Product = () => {
                   />
                 ))}
                 <Image
-                  className="h-4 w-4"
+                  className="h-4 w-4 object-contain"
                   src={assets.star_dull_icon}
                   alt=""
                   width={16}
@@ -325,12 +325,6 @@ const Product = () => {
             <p className="text-gray-600 mt-4 leading-relaxed line-clamp-4">
               {shortText}
             </p>
-
-            <DimensionsWeightTable
-              product={productData}
-              compact
-              className="mt-6 max-w-sm"
-            />
 
             <div className="grid grid-cols-3 gap-3 mt-6">
               {TRUST_BADGES.map((badge) => (
@@ -369,7 +363,7 @@ const Product = () => {
                         <img
                           src={productData.colorImages[color]}
                           alt=""
-                          className="w-5 h-5 rounded-full object-cover"
+                          className="w-5 h-5 rounded-full object-contain"
                         />
                       )}
                       {color}
