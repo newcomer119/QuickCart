@@ -91,26 +91,41 @@ export async function PUT(request, { params }) {
             updateData.colors = JSON.parse(formData.get('colors'));
         }
 
-        // Handle new product images
-        const newImages = formData.getAll('images');
-        if (newImages.length > 0) {
-            const imageUrls = await Promise.all(
-                newImages.map(async (file) => {
+        // Merge existing image slots with any newly uploaded files
+        if (formData.has('existingImages')) {
+            const slots = JSON.parse(formData.get('existingImages'));
+            for (let i = 0; i < 4; i++) {
+                const file = formData.get(`imageSlot_${i}`);
+                if (file && typeof file.arrayBuffer === 'function') {
                     const arrayBuffer = await file.arrayBuffer();
                     const buffer = Buffer.from(arrayBuffer);
                     const result = await uploadToCloudinary(buffer);
-                    return result.secure_url;
-                })
-            );
-            // This replaces all images. A more complex logic would be needed to add/remove specific images.
-            updateData.image = imageUrls;
+                    slots[i] = result.secure_url;
+                }
+            }
+            updateData.image = slots.filter(Boolean);
+        } else {
+            const newImages = formData.getAll('images');
+            if (newImages.length > 0) {
+                const imageUrls = await Promise.all(
+                    newImages.map(async (file) => {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const buffer = Buffer.from(arrayBuffer);
+                        const result = await uploadToCloudinary(buffer);
+                        return result.secure_url;
+                    })
+                );
+                updateData.image = imageUrls;
+            }
         }
-        
-        // Handle new color images
-        const colorImages = product.colorImages || {};
-        for (const color of updateData.colors || product.colors) {
+
+        // Handle color images for selected colors only
+        const colors = updateData.colors || product.colors;
+        const colorImages = {};
+        for (const color of colors) {
+            colorImages[color] = (product.colorImages || {})[color] || null;
             const colorFile = formData.get(`colorImages[${color}]`);
-            if (colorFile) {
+            if (colorFile && typeof colorFile.arrayBuffer === 'function') {
                 const arrayBuffer = await colorFile.arrayBuffer();
                 const buffer = Buffer.from(arrayBuffer);
                 const result = await uploadToCloudinary(buffer);
