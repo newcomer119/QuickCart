@@ -11,6 +11,12 @@ const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"] });
 export const metadata = {
   title: "Custom 3D Printing & Premium PLA+ Filament Store India | Filament Freaks",
   description: "Filament Freaks offers custom 3D printing services, personalized 3D printed products, lamps, word art, prototypes, and premium PLA+ filaments across India.",
+  alternates: {
+    canonical: "https://www.filamentfreaks.com",
+    languages: {
+      "en-US": "https://www.filamentfreaks.com/en",
+    },
+  },
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
