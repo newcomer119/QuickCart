@@ -203,7 +203,8 @@ export function SpecsAndDimensionsSection({ product }) {
   );
 }
 
-export function CompatibilitySection({ compatibility }) {
+// Pass isLamp={true} for lamp products to show the "No Power Required" badge
+export function CompatibilitySection({ compatibility, isLamp = false }) {
   if (!compatibility) return null;
   return (
     <section className="py-10 border-t border-gray-200">
@@ -215,11 +216,13 @@ export function CompatibilitySection({ compatibility }) {
         <p className="md:col-span-2 text-gray-600 leading-relaxed whitespace-pre-line">
           {compatibility}
         </p>
-        <div className="border border-green-200 bg-green-50 rounded-lg p-5 text-center">
-          <span className="text-3xl">🔌</span>
-          <p className="font-semibold text-green-800 mt-2">No Power Required</p>
-          <p className="text-xs text-green-700 mt-1">Display anywhere</p>
-        </div>
+        {isLamp && (
+          <div className="border border-green-200 bg-green-50 rounded-lg p-5 text-center">
+            <span className="text-3xl">🔌</span>
+            <p className="font-semibold text-green-800 mt-2">No Power Required</p>
+            <p className="text-xs text-green-700 mt-1">Display anywhere</p>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -321,26 +324,7 @@ export function FaqSection({ product }) {
 export function TrustBar() {
   return (
     <section className="py-10 border-t border-gray-200 bg-orange-50/40 rounded-xl px-6 my-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="flex -space-x-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="w-8 h-8 rounded-full bg-orange-200 border-2 border-white"
-              />
-            ))}
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900">10,000+ happy customers</p>
-            <div className="flex items-center gap-1 text-sm text-gray-600">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Image key={i} src={assets.star_icon} alt="" width={14} height={14} />
-              ))}
-              <span className="ml-1">4.8/5 rating</span>
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col md:flex-row items-center justify-center gap-6">
         <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700">
           <span>✓ Premium Quality</span>
           <span>✓ Secure Payment</span>
