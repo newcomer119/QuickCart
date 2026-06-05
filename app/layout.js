@@ -37,6 +37,15 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <head>
+          <Script id="gtm-script" strategy="afterInteractive">
+            {`
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-TNZ8PTKV');
+            `}
+          </Script>
           <link rel="icon" href="/favicon.ico" sizes="any" />
           <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
           <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
@@ -44,6 +53,14 @@ export default function RootLayout({ children }) {
           <link rel="manifest" href="/site.webmanifest" />
         </head>
         <body className={`${outfit.className} antialiased text-gray-700`}>
+          <noscript>
+            <iframe
+              src="https://www.googletagmanager.com/ns.html?id=GTM-TNZ8PTKV"
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
           <Toaster />
           <AppContextProvider>
             <LoadingOverlayWrapper />
