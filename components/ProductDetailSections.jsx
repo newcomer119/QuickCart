@@ -328,7 +328,7 @@ export function TrustBar() {
         <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-700">
           <span>✓ Premium Quality</span>
           <span>✓ Secure Payment</span>
-          <span>✓ Easy Returns</span>
+          <span>✓ COD Available</span>
         </div>
       </div>
     </section>

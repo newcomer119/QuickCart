@@ -423,10 +423,7 @@ const Product = () => {
               </button>
             </div>
 
-            <p className="flex items-center gap-2 text-sm text-gray-500 mt-4">
-              <FiCheck className="text-green-600" />
-              Trusted by 10,000+ happy customers
-            </p>
+            
           </div>
         </div>
 
