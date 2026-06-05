@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/nextjs";
 import LoadingOverlayWrapper from "@/components/LoadingOverlayWrapper";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"] });
 
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
         <head>
           <link rel="icon" href="/favicon.ico" sizes="any" />
           <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
