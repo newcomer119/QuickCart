@@ -51,6 +51,7 @@ export default function RootLayout({ children }) {
             <LoadingOverlayWrapper />
             {children}
             <WhatsAppButton />
+            <Toaster position="top-center" reverseOrder={false} />
           </AppContextProvider>
         </body>
       </html>
