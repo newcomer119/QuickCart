@@ -304,9 +304,7 @@ const Product = () => {
               </div>
               <span className="text-sm text-gray-600">
                 4.8{" "}
-                <button type="button" className="text-orange-600 underline">
-                  (128 reviews)
-                </button>
+                
               </span>
             </div>
 
